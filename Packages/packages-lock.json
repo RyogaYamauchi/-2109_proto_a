@@ -7,6 +7,13 @@
       "dependencies": {},
       "hash": "69be818a46ca876afc5cb370a0ceb00324b4437d"
     },
+    "com.demigiant.dotween": {
+      "version": "1.2.632",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://package.openupm.com"
+    },
     "com.neuecc.unirx": {
       "version": "https://github.com/neuecc/UniRx.git?path=Assets/Plugins/UniRx/Scripts",
       "depth": 0,
