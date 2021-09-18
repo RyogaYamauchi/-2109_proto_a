@@ -1,52 +1,129 @@
+using System;
 using Photon.Pun;
 using Photon.Realtime;
 using UniRx;
 using UnityEngine;
+using App.Lib;
+using UnityEngine.Serialization;
 
 namespace App.Matching
 {
-    public class MatchingPresenter : MonoBehaviourPunCallbacks
+    public class MatchingPresenter : PresenterBase
     {
-        [SerializeField] private MatchingStateView _matchingStateView;
+        private readonly MatchingStateView _matchingStateView;
+        // ハッシュテーブルを宣言
+        private ExitGames.Client.Photon.Hashtable _roomHash;
 
-        private void Awake()
+        public MatchingPresenter(MatchingStateView stateView)
         {
+            _matchingStateView = stateView;
+            
             _matchingStateView.InitializeAsyncSubject
                 .Subscribe(_ =>
                 {
-                    PhotonInitialize();
+                   Init();
                 })
-                .AddTo(this);
+                .AddTo(_matchingStateView);
+        }
+        
+        private void Init()
+        {
+            PhotonInitialize();
             
             _matchingStateView.ConnectedToMaster
                 .Subscribe(_ =>
                 {
                     JoinOrCreateRoom();
                 })
-                .AddTo(this);
+                .AddTo(_matchingStateView);
             
             _matchingStateView.JoinedRoom
                 .Subscribe(_ =>
                 {
                     CreateAvatar();
                 })
-                .AddTo(this);
+                .AddTo(_matchingStateView);
+            
+            _matchingStateView.PlayerJoinedRoom
+                .Subscribe(_ =>
+                {
+                    if (!PhotonNetwork.IsMasterClient)
+                    {
+                        return;
+                    }
+
+                    if (PhotonNetwork.PlayerList.Length == 2)
+                    {
+                        ChangeSceneState(SceneState.SceneStateType.Main);
+                    }
+                    
+                })
+                .AddTo(_matchingStateView);
+            
+            _matchingStateView.ChangeScene
+                .Subscribe(_ =>
+                {
+                    ChangeSceneToMain();
+                })
+                .AddTo(_matchingStateView);
+
+            if (PhotonNetwork.IsMasterClient)
+            {
+                ChangeSceneState(SceneState.SceneStateType.Matching);
+            }
         }
 
+        /// <summary>
+        /// PhotonServerSettingsの設定内容を使ってマスターサーバーへ接続する
+        /// </summary>
         private void PhotonInitialize()
         {
-            // PhotonServerSettingsの設定内容を使ってマスターサーバーへ接続する
             PhotonNetwork.ConnectUsingSettings();
         }
         
-        private void JoinOrCreateRoom() {
-            // "Room"という名前のルームに参加する（ルームが存在しなければ作成して参加する）
+        /// <summary>
+        /// Roomがあれば入る、なければ作る
+        /// </summary>
+        private void JoinOrCreateRoom() 
+        {
             PhotonNetwork.JoinOrCreateRoom("Room", new RoomOptions(), TypedLobby.Default);
         }
         
-        private  void CreateAvatar() {
-            PhotonNetwork.Instantiate("Avatar", Vector3.zero, Quaternion.identity);
+        private  void CreateAvatar() 
+        {
+           //  PhotonNetwork.Instantiate("Avatar", Vector3.zero, Quaternion.identity);
+           Debug.Log("create");
         }
+
+        /// <summary>
+        /// sceneStateを変更
+        /// </summary>
+        /// <param name="sceneState"></param>
+        private void ChangeSceneState(SceneState.SceneStateType sceneState)
+        {
+            var prop = PhotonNetwork.CurrentRoom.CustomProperties;
+            
+            //キーを持っているか確認した方がよさそう
+            if (prop.TryGetValue("scene_state",out var _))
+            {
+                prop["scene_state"] = sceneState.ToString();
+            }
+            else
+            {
+                prop.Add("scene_state", sceneState.ToString());
+            }
+            //更新したプロパティをセットする
+            PhotonNetwork.CurrentRoom.SetCustomProperties(prop);
+        }
+        
+        /// <summary>
+        /// MainSceneへ行く
+        /// </summary>
+        private  void ChangeSceneToMain()
+        {
+            Debug.Log("main");
+        }
+
     }
 }
 

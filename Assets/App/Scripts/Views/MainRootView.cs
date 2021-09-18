@@ -1,21 +1,24 @@
 ﻿using App.Lib;
 using App.Presenters;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace App.Views
 {
     [RootSceneName(("MainScene"))]
-    public sealed class TsumuRootView : RootViewBase
+    public sealed class MainRootView : RootViewBase
     {
-        [SerializeField] private Image _image;
+        [SerializeField] private Transform _tsumuRoot;
 
         // Sceneのエントリーポイント
         private void Start()
         {
             var presenter = new TsumuRootPresenter(this);
             presenter.Initialize();
-            _image.color = Color.green;
+        }
+
+        public void SetParentTsumu(TsumuView tsumuView)
+        {
+            tsumuView.transform.SetParent(_tsumuRoot, false);
         }
     }
 }
