@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.Design.Serialization;
 using App.Lib;
 using App.Types;
 using App.ViewModels;
@@ -6,6 +7,7 @@ using Cysharp.Threading.Tasks;
 using UniRx;
 using UniRx.Triggers;
 using UnityEngine;
+using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
 
 namespace App.Views
@@ -45,7 +47,8 @@ namespace App.Views
         public void Initialize(TsumuViewModel viewModel,  Vector2 position)
         {
             _tsumuViewModel = viewModel;
-            _button.image.color = TsumuColor.ConvertTsumuColor(_tsumuViewModel.TsumuData.TsumuType);
+            var instance = Instantiate(viewModel.ColiderObject, transform, false);
+            _button.image = instance.GetComponent<Image>();
             transform.position = position;
         }
 
