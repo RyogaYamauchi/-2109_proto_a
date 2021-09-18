@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a168975c5d8a4ccd97180b306bc5d130, type: 3}
   m_Name: Yellow
   m_EditorClassIdentifier: 
-  _tsumuType: 0
+  _tsumuType: 3
