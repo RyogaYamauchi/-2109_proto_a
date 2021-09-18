@@ -1115,6 +1115,7 @@ MonoBehaviour:
   _titleButton: {fileID: 708828907}
   _retryButton: {fileID: 1521575330}
   _resultText: {fileID: 570713766}
+  _rateltText: {fileID: 0}
   loseEnemy: {fileID: 340926353}
   winEnemy: {fileID: 1712411758}
   winOrLose: 1
