@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using App.Lib;
 using App.Models;
+using App.Skills;
 using App.Views;
 using Cysharp.Threading.Tasks;
 using UniRx;
@@ -18,23 +20,17 @@ namespace App.Presenters
 
         private TsumuRootModel _tsumuRootModel => _gameModel.TsumuRootModel;
         private List<TsumuView> _tsumuViewList = new List<TsumuView>();
+        private ISkill _skill;
 
         public TsumuRootPresenter(MainRootView view, IParameter parameter)
         {
             var param = (MainRootView.Paramater) parameter;
+            _skill = param.Skill;
             _maxTsumuCount = param.MaxTsumuCount;
             Debug.Log(_maxTsumuCount);
             _mainRootView = view;
         }
-
-        private void SetEvents()
-        {
-            _mainRootView.OnClickGoResultAsObservable.Subscribe(x =>
-            {
-                ChangeScene<ResultRootView>(new ResultRootView.Parameter(true)).Forget();
-            });
-        }
-
+        
         public async void Initialize()
         {
             _gameModel.TsumuRootModel.Initialize();
@@ -45,7 +41,19 @@ namespace App.Presenters
             }
         }
 
+        private void SetEvents()
+        {
+            _mainRootView.OnClickSkillAsObservable.Subscribe(x =>
+            {
+                UseSkillAsync(_skill).Forget();
+            });
+        }
 
+        private async UniTask UseSkillAsync(ISkill skill)
+        {
+            await skill.ExecuteAsync(this);
+        }
+        
         private async UniTask SpawnTsumuAsync()
         {
             var viewModel = _gameModel.TsumuRootModel.SpawnTsumu();
@@ -149,6 +157,19 @@ namespace App.Presenters
             }
 
             return false;
+        }
+
+        public IReadOnlyList<TsumuView> GetReadOnLyTsumuList()
+        {
+            return _tsumuViewList.AsReadOnly();
+        }
+
+        public async Task DespawnTsumuListAsync(List<TsumuView> targetTsumuList)
+        {
+            foreach (var view in targetTsumuList)
+            {
+                await DespawnTsumuAsync(view);
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using App.Lib;
 using System;
 using App.Presenters;
+using App.Skills;
 using Cysharp.Threading.Tasks;
 
 namespace App.Views
@@ -14,10 +15,12 @@ namespace App.Views
         public class Parameter : IParameter
         {
             public bool IsWinOrLose;
+            public ISkill Skill;
 
-            public Parameter(bool isWinorLose)
+            public Parameter(bool isWinorLose, ISkill skill)
             {
                 IsWinOrLose = isWinorLose;
+                Skill = skill;
             }
         }
         [SerializeField]
@@ -35,8 +38,9 @@ namespace App.Views
 
         protected override UniTask OnLoadAsync()
         {
-            var presenter = new ResultRootPresenter(this);
-            var winOrLose = ((Parameter) GetParameter()).IsWinOrLose;
+            var param = ((Parameter) GetParameter());
+            var presenter = new ResultRootPresenter(this, param.Skill);
+            var winOrLose = param.IsWinOrLose;
             Debug.Log(winOrLose);
             //_rateltText.text = "1300";
             if (winOrLose == true)
