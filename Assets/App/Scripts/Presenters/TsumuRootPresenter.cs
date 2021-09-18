@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using App.Lib;
-using App.MasterData;
+using App.Models;
 using App.Views;
 using Cysharp.Threading.Tasks;
 using UniRx;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace App.Presenters
 {
@@ -17,8 +16,7 @@ namespace App.Presenters
         private readonly int _maxTsumuCount = 40;
         private readonly int _canSelectDistance = 300;
 
-        private List<TsumuData> _tsumuDataList = new List<TsumuData>();
-        private List<TsumuView> _selectingTsumuViewList = new List<TsumuView>();
+        private TsumuRootModel _tsumuRootModel => _gameModel.TsumuRootModel;
         private List<TsumuView> _tsumuViewList = new List<TsumuView>();
 
         public TsumuRootPresenter(MainRootView view)
@@ -32,74 +30,51 @@ namespace App.Presenters
 
         public async void Initialize()
         {
+            _gameModel.TsumuRootModel.Initialize();
             SetEvents();
-            _tsumuDataList = LoadTsumuData();
             for (var i = 0; i < 10; i++)
             {
                 await SpawnTsumuAsync();
             }
         }
 
-        private List<TsumuData> LoadTsumuData()
-        {
-            return Resources.LoadAll<TsumuData>("MasterData/").ToList();
-        }
 
         private async UniTask SpawnTsumuAsync()
         {
-            var data = _tsumuDataList.OrderBy(x => Guid.NewGuid()).First();
-            Assert.IsNotNull(data);
+            var viewModel = _gameModel.TsumuRootModel.SpawnTsumu();
             var tsumuView = await CreateViewAsync<TsumuView>();
             _mainRootView.SetParentTsumu(tsumuView);
-            tsumuView.Initialize(data, new Vector3(0, 0, 0));
+            tsumuView.Initialize(viewModel, Vector3.zero);
             tsumuView.OnPointerEnterAsObservable.Subscribe(OnPointerEntertsumu);
             tsumuView.OnPointerDownAsObservable.Subscribe(OnPointerDownTsumu);
             tsumuView.OnPointerUpAsObservable.Subscribe(x => OnPointerUpTsumu(x).Forget());
-            
+            _tsumuViewList.Add(tsumuView);
             await UniTask.Delay(500);
         }
 
         private void SelectTsumu(TsumuView view)
         {
-            _selectingTsumuViewList.Add(view);
+            _gameModel.TsumuRootModel.SelectTsumu(view.Guid);
             view.ChangeColor(true);
         }
 
-
         private void UnSelectTsumuAll()
         {
-            _selectingTsumuViewList.ForEach(x => x.ChangeColor(false));
-            _selectingTsumuViewList.Clear();
-        }
-
-        private void OnPointerDownTsumu(TsumuView view)
-        {
-            if (_selectingTsumuViewList.Count > 0)
+            var selectingTsumuList = _gameModel.TsumuRootModel.GetSelectingTsumuIdList();
+            var views = _tsumuViewList.Where(view => selectingTsumuList.Any(guid => view.Guid == guid));
+            foreach (var view in views)
             {
-                return;
+                view.ChangeColor(false);
             }
 
-            SelectTsumu(view);
-        }
-
-        private UniTask OnPointerUpTsumu(TsumuView view)
-        {
-            if (_selectingTsumuViewList.Count < 3)
-            {
-                UnSelectTsumuAll();
-                return UniTask.CompletedTask;
-            }
-
-            DespawnSelectingTsumusAsync().Forget();
-            UnSelectTsumuAll();
-            return UniTask.CompletedTask;
+            _gameModel.TsumuRootModel.UnSelectTsumuAll();
         }
 
         private async UniTask DespawnSelectingTsumusAsync()
         {
-            var chain = _selectingTsumuViewList.Count;
-            var animatingTsumuViews = _selectingTsumuViewList.ToArray();
-            foreach (var view in animatingTsumuViews)
+            var ids = _tsumuRootModel.GetSelectingTsumuIdList();
+            var views = _tsumuViewList.Where(x => ids.Contains(x.Guid)).ToArray();
+            foreach (var view in views)
             {
                 await DespawnTsumuAsync(view);
             }
@@ -121,22 +96,46 @@ namespace App.Presenters
             SelectTsumu(view);
         }
 
+        private UniTask OnPointerUpTsumu(TsumuView view)
+        {
+            if (_tsumuRootModel.GetSelectingTsumuCount() < 3)
+            {
+                UnSelectTsumuAll();
+                return UniTask.CompletedTask;
+            }
+
+            DespawnSelectingTsumusAsync().Forget();
+            UnSelectTsumuAll();
+            return UniTask.CompletedTask;
+        }
+
+        private void OnPointerDownTsumu(TsumuView view)
+        {
+            if (_tsumuRootModel.GetSelectingTsumuCount() != 0)
+            {
+                return;
+            }
+
+            SelectTsumu(view);
+        }
+
+
         private bool CanSelect(TsumuView view)
         {
-            if (_selectingTsumuViewList.Count == 0)
+            var lastGuid = _gameModel.TsumuRootModel.GetLastTsumuGuid();
+            if (lastGuid == Guid.Empty)
             {
                 return false;
             }
-
-            var lastView = _selectingTsumuViewList.Last();
-
-            if (lastView.TsumuType != view.TsumuType)
-            {
-                return false;
-            }
-
+            var lastView = _tsumuViewList.FirstOrDefault(x => x.Guid == lastGuid);
             var difference = lastView.GetPosition() - view.GetPosition();
-            Debug.Log(difference);
+            var modelState = _tsumuRootModel.CanSelect(view.Guid);
+
+            if (!modelState)
+            {
+                return false;
+            }
+
             if (Mathf.Abs(difference.x) < _canSelectDistance && Mathf.Abs(difference.y) < _canSelectDistance)
             {
                 return true;

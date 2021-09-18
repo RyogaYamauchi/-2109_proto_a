@@ -2,6 +2,7 @@
 using App.Lib;
 using App.MasterData;
 using App.Types;
+using App.ViewModels;
 using Cysharp.Threading.Tasks;
 using UniRx;
 using UniRx.Triggers;
@@ -16,7 +17,6 @@ namespace App.Views
     {
         [SerializeField] private Button _button;
 
-        private TsumuData _tsumuData;
         private readonly Subject<TsumuView> _onPointerDownSubject = new Subject<TsumuView>();
         private readonly Subject<TsumuView> _onPointerEnterSubject = new Subject<TsumuView>();
         private readonly Subject<TsumuView> _onPointerUpSubject = new Subject<TsumuView>();
@@ -25,7 +25,10 @@ namespace App.Views
         public IObservable<TsumuView> OnPointerEnterAsObservable => _onPointerEnterSubject.TakeUntilDestroy(this);
         public IObservable<TsumuView> OnPointerDownAsObservable => _onPointerDownSubject.TakeUntilDestroy(this);
 
-        public TsumuType TsumuType => _tsumuData.TsumuType;
+        private TsumuViewModel _tsumuViewModel;
+        public TsumuType TsumuType => _tsumuViewModel.TsumuData.TsumuType;
+        public Guid Guid => _tsumuViewModel.Guid;
+        
 
         
         protected override UniTask OnLoadAsync()
@@ -41,10 +44,10 @@ namespace App.Views
             _button.image.color = state ? Color.black : TsumuColor.ConvertTsumuColor(TsumuType);
         }
 
-        public void Initialize(TsumuData data, Vector3 position)
+        public void Initialize(TsumuViewModel viewModel,  Vector3 position)
         {
-            _tsumuData = data;
-            _button.image.color = TsumuColor.ConvertTsumuColor(data.TsumuType);
+            _tsumuViewModel = viewModel;
+            _button.image.color = TsumuColor.ConvertTsumuColor(_tsumuViewModel.TsumuData.TsumuType);
             transform.localPosition = position;
         }
 

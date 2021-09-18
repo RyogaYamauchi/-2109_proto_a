@@ -4,6 +4,6 @@ namespace App.Lib
 {
     public abstract class RootPresenterBase : PresenterBase
     {
-        GameModel _gameModel = GameModel.Instance;
+        protected GameModel _gameModel = GameModel.Instance;
     }
 }
