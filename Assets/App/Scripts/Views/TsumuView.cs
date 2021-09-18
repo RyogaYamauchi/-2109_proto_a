@@ -1,13 +1,11 @@
 ﻿using System;
 using App.Lib;
-using App.MasterData;
 using App.Types;
 using App.ViewModels;
 using Cysharp.Threading.Tasks;
 using UniRx;
 using UniRx.Triggers;
 using UnityEngine;
-using UnityEngine.UIElements;
 using Button = UnityEngine.UI.Button;
 
 namespace App.Views
@@ -44,11 +42,11 @@ namespace App.Views
             _button.image.color = state ? Color.black : TsumuColor.ConvertTsumuColor(TsumuType);
         }
 
-        public void Initialize(TsumuViewModel viewModel,  Vector3 position)
+        public void Initialize(TsumuViewModel viewModel,  Vector2 position)
         {
             _tsumuViewModel = viewModel;
             _button.image.color = TsumuColor.ConvertTsumuColor(_tsumuViewModel.TsumuData.TsumuType);
-            transform.localPosition = position;
+            transform.position = position;
         }
 
         public UniTask CloseAsync()

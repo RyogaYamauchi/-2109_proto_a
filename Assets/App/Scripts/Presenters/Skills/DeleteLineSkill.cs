@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using App.Presenters;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 namespace App.Skills
 {
@@ -10,6 +11,7 @@ namespace App.Skills
         private readonly int YRange = 100;
         public async UniTask ExecuteAsync(TsumuRootPresenter tsumuRootPresenter)
         {
+            Debug.Log("Execute ");
             var tsumuList = tsumuRootPresenter.GetReadOnLyTsumuList();
             var targetTsumuList = tsumuList.Where(tsumuView =>
             {
