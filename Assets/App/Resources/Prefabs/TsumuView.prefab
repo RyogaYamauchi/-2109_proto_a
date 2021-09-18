@@ -39,7 +39,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 50, y: 50}
+  m_SizeDelta: {x: 150, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5684856827884847652
 CanvasRenderer:
@@ -170,6 +170,6 @@ CircleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.1610794, y: -0.08053017}
+  m_Offset: {x: -0.63101196, y: -0.08053589}
   serializedVersion: 2
-  m_Radius: 20.875633
+  m_Radius: 62.163666
