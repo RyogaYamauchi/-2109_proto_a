@@ -2,11 +2,10 @@ using System;
 using Photon.Pun;
 using Photon.Realtime;
 using UniRx;
-using App.Lib;
-using UnityEngine;
+using App.Presenters.Matching;
 
 
-namespace  App.Matching
+namespace App.View.Matching
 {
     public class MatchingStateView : MonoBehaviourPunCallbacks
     {
