@@ -2,8 +2,8 @@ using System;
 using Photon.Pun;
 using Photon.Realtime;
 using UniRx;
+using App.Lib;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 
 namespace  App.Matching
@@ -18,6 +18,14 @@ namespace  App.Matching
         
         private readonly Subject<Unit> _joinedRoom = new Subject<Unit>();
         public IObservable<Unit> JoinedRoom => _joinedRoom;
+        
+        private readonly Subject<Unit> _playerJoinedRoom = new Subject<Unit>();
+        public IObservable<Unit> PlayerJoinedRoom => _playerJoinedRoom;
+        
+        private readonly Subject<Unit> _changeScene = new Subject<Unit>();
+        public IObservable<Unit> ChangeScene => _changeScene;
+
+        private MatchingPresenter _matchingPresenter;
         void Start()
         {
             Initialize();
@@ -25,6 +33,7 @@ namespace  App.Matching
 
         private void Initialize()
         {
+            _matchingPresenter = new MatchingPresenter(this);
             _initializeAsyncSubject.OnNext(Unit.Default);
             _initializeAsyncSubject.OnCompleted();
         }
@@ -37,6 +46,25 @@ namespace  App.Matching
         // ゲームサーバーへの接続が成功した時に呼ばれるコールバック
         public override void OnJoinedRoom() {
             _joinedRoom.OnNext(Unit.Default);
+        }
+        
+        public override void  OnPlayerEnteredRoom(Player other)
+        {
+            if (PhotonNetwork.IsMasterClient)
+            {
+                _playerJoinedRoom.OnNext(Unit.Default);
+            }
+        }
+
+        public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
+        {
+            if (propertiesThatChanged.TryGetValue("scene_state", out var value))
+            {
+                if ((string)value == SceneState.SceneStateType.Main.ToString())
+                {
+                    _changeScene.OnNext(Unit.Default);
+                }
+            }
         }
     }
 }
