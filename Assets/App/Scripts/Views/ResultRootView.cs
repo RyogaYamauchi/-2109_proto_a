@@ -1,18 +1,25 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
 using UnityEngine.UI;
 using App.Lib;
 using System;
 using App.Presenters;
+using Cysharp.Threading.Tasks;
 
 namespace App.Views
 {
     [RootSceneName("Result")]
-    public class ResultView : RootViewBase
+    public class ResultRootView : RootViewBase
     {
+        public class Parameter : IParameter
+        {
+            public bool IsWinOrLose;
 
+            public Parameter(bool isWinorLose)
+            {
+                IsWinOrLose = isWinorLose;
+            }
+        }
         [SerializeField]
         private Button _titleButton;
         [SerializeField]
@@ -25,13 +32,12 @@ namespace App.Views
         public IObservable<Unit> OnClickRetry => _retryButton.OnClickAsObservable().TakeUntilDestroy(this);
         public GameObject loseEnemy;
         public GameObject winEnemy;
-        public bool winOrLose = true;
 
-
-        // Start is called before the first frame update
-        void Start()
+        protected override UniTask OnLoadAsync()
         {
             var presenter = new ResultRootPresenter(this);
+            var winOrLose = ((Parameter) GetParameter()).IsWinOrLose;
+            Debug.Log(winOrLose);
             //_rateltText.text = "1300";
             if (winOrLose == true)
             {
@@ -45,12 +51,8 @@ namespace App.Views
                 winEnemy.SetActive(false);
                 loseEnemy.SetActive(true);
             }
+            return base.OnLoadAsync();
         }
-
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
+        
     }
 }

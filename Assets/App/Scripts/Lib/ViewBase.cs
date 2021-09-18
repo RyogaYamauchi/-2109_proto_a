@@ -6,6 +6,19 @@ namespace App.Lib
 {
     public abstract class ViewBase : MonoBehaviour, IDisposable
     {
+        protected bool IsLoading;
+        protected bool IsLoaded;
+
+        public void SetLoading(bool state)
+        {
+            IsLoading = state;
+        }
+
+        public void SetLoaded(bool state)
+        {
+            IsLoaded = state;
+        }
+
         protected virtual UniTask OnLoadAsync()
         {
             return UniTask.CompletedTask;
@@ -25,7 +38,7 @@ namespace App.Lib
         {
             await OnDidLoadAsync();
         }
-        
+
 
         public void Dispose()
         {

@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using App.Lib;
 using App.Views;
 using UniRx;
@@ -10,11 +7,13 @@ namespace App.Presenters
 {
     public class ResultRootPresenter : RootPresenterBase
     {
-        public ResultRootPresenter(ResultView view)
+        public ResultRootPresenter(ResultRootView rootView)
         {
             //view.OnClickTitle.Subscribe(x => ChangeScene<Title>);
-            view.OnClickRetry.Subscribe(x => ChangeScene<MainRootView>().Forget());
+            rootView.OnClickRetry.Subscribe(x =>
+            {
+                ChangeScene<MainRootView>(new MainRootView.Paramater(30)).Forget();
+            });
         }
-
     }
 }
