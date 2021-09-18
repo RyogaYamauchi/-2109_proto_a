@@ -13,19 +13,26 @@ namespace App.Presenters
     public sealed class TsumuRootPresenter : RootPresenterBase
     {
         private MainRootView _mainRootView;
-        private readonly int _maxTsumuCount = 40;
+        private readonly int _maxTsumuCount;
         private readonly int _canSelectDistance = 300;
 
         private TsumuRootModel _tsumuRootModel => _gameModel.TsumuRootModel;
         private List<TsumuView> _tsumuViewList = new List<TsumuView>();
 
-        public TsumuRootPresenter(MainRootView view)
+        public TsumuRootPresenter(MainRootView view, IParameter parameter)
         {
+            var param = (MainRootView.Paramater) parameter;
+            _maxTsumuCount = param.MaxTsumuCount;
+            Debug.Log(_maxTsumuCount);
             _mainRootView = view;
         }
 
         private void SetEvents()
         {
+            _mainRootView.OnClickGoResultAsObservable.Subscribe(x =>
+            {
+                ChangeScene<ResultRootView>(new ResultRootView.Parameter(true)).Forget();
+            });
         }
 
         public async void Initialize()
