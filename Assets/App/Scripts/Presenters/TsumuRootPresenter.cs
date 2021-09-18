@@ -8,6 +8,7 @@ using App.Skills;
 using App.Views;
 using Cysharp.Threading.Tasks;
 using UniRx;
+using UniRx.Triggers;
 using UnityEngine;
 
 namespace App.Presenters
@@ -17,9 +18,16 @@ namespace App.Presenters
         private MainRootView _mainRootView;
         private readonly int _maxTsumuCount;
         private readonly int _canSelectDistance = 300;
+        private readonly Vector2[] _spawnPoint =
+        {
+            new Vector2(-300, 0), new Vector2(-200, 0), new Vector2(-100, 0),
+            new Vector2(0, 0), new Vector2(100, 0), new Vector2(200, 0), new Vector2(300, 0)
+        };
 
         private TsumuRootModel _tsumuRootModel => _gameModel.TsumuRootModel;
         private List<TsumuView> _tsumuViewList = new List<TsumuView>();
+        private List<Vector2> _canSpawnTsumuPoints = new List<Vector2>();
+
         private ISkill _skill;
 
         public TsumuRootPresenter(MainRootView view, IParameter parameter)
@@ -31,14 +39,11 @@ namespace App.Presenters
             _mainRootView = view;
         }
         
-        public async void Initialize()
+        public void Initialize()
         {
             _gameModel.TsumuRootModel.Initialize();
             SetEvents();
-            for (var i = 0; i < 10; i++)
-            {
-                await SpawnTsumuAsync();
-            }
+            _canSpawnTsumuPoints = new List<Vector2>(_spawnPoint);
         }
 
         private void SetEvents()
@@ -47,6 +52,25 @@ namespace App.Presenters
             {
                 UseSkillAsync(_skill).Forget();
             });
+            _mainRootView.UpdateAsObservable().Subscribe(x =>
+            {
+                RefillTsumus();
+            }).AddTo(_mainRootView);
+        }
+        
+        private void RefillTsumus()
+        {
+            if (_canSpawnTsumuPoints.Count == 0)
+            {
+                return;
+            }
+
+            if (_tsumuViewList.Count > _maxTsumuCount)
+            {
+                return;
+            }
+
+            SpawnTsumuAsync().Forget();
         }
 
         private async UniTask UseSkillAsync(ISkill skill)
@@ -56,15 +80,20 @@ namespace App.Presenters
         
         private async UniTask SpawnTsumuAsync()
         {
+            _canSpawnTsumuPoints = _canSpawnTsumuPoints.OrderBy(x => Guid.NewGuid()).ToList();
+            var spawnPoint = _canSpawnTsumuPoints.FirstOrDefault();
+            _canSpawnTsumuPoints.Remove(spawnPoint);
             var viewModel = _gameModel.TsumuRootModel.SpawnTsumu();
             var tsumuView = await CreateViewAsync<TsumuView>();
             _mainRootView.SetParentTsumu(tsumuView);
-            tsumuView.Initialize(viewModel, Vector3.zero);
+            var spawnRootPosition = _mainRootView.GetSpawnRootPosition();
+            tsumuView.Initialize(viewModel,  new Vector2(spawnRootPosition.x + spawnPoint.x, spawnRootPosition.y));
             tsumuView.OnPointerEnterAsObservable.Subscribe(OnPointerEntertsumu);
             tsumuView.OnPointerDownAsObservable.Subscribe(OnPointerDownTsumu);
             tsumuView.OnPointerUpAsObservable.Subscribe(x => OnPointerUpTsumu(x).Forget());
             _tsumuViewList.Add(tsumuView);
             await UniTask.Delay(500);
+            _canSpawnTsumuPoints.Add(spawnPoint);
         }
 
         private void SelectTsumu(TsumuView view)

@@ -12,7 +12,6 @@ namespace App.Views
     [RootSceneName(("MainScene"))]
     public sealed class MainRootView : RootViewBase
     {
-        [SerializeField] private Button _button;
         public class Paramater : IParameter
         {
             public int MaxTsumuCount;
@@ -24,6 +23,8 @@ namespace App.Views
                 Skill = skill;
             }
         }
+        [SerializeField] private Button _button;
+        [SerializeField] private Transform _tsumuSpawnRoot;
         [SerializeField] private Transform _tsumuRoot;
 
         public IObservable<Unit> OnClickSkillAsObservable => _button.OnClickAsObservable().TakeUntilDestroy(this);
@@ -49,6 +50,11 @@ namespace App.Views
         public void SetParentTsumu(TsumuView tsumuView)
         {
             tsumuView.transform.SetParent(_tsumuRoot, false);
+        }
+
+        public Vector2 GetSpawnRootPosition()
+        {
+            return _tsumuSpawnRoot.position;
         }
     }
 }
