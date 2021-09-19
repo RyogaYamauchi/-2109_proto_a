@@ -20,6 +20,9 @@ namespace App.View.Matching
         private readonly Subject<Unit> _joinedRoom = new Subject<Unit>();
         public IObservable<Unit> JoinedRoom => _joinedRoom;
         
+        private readonly Subject<Unit> _joinedFailedRoom = new Subject<Unit>();
+        public IObservable<Unit> JoinedFailedRoom => _joinedFailedRoom;
+        
         private readonly Subject<Unit> _playerJoinedRoom = new Subject<Unit>();
         public IObservable<Unit> PlayerJoinedRoom => _playerJoinedRoom;
         
@@ -29,21 +32,11 @@ namespace App.View.Matching
         private MatchingPresenter _matchingPresenter;
 
         private bool _isChange = false;
-        // public override UniTask OnLoadAsync()
-        // {
-        //     Initialize();
-        //     return base.OnLoadAsync();
-        // }
-
-        // private void Initialize()
-        // {
-        //     _matchingPresenter = new MatchingPresenter(this);
-        //     _initializeAsyncSubject.OnNext(Unit.Default);
-        //     _initializeAsyncSubject.OnCompleted();
-        // }
+        
         
         // マスターサーバーへの接続が成功した時に呼ばれるコールバック
         public override void OnConnectedToMaster() {
+            _isChange = false;
             _connectedToMaster.OnNext(Unit.Default);
         }
 
@@ -71,6 +64,11 @@ namespace App.View.Matching
                     _changeScene.OnNext(Unit.Default);
                 }
             }
+        }
+
+        // ランダムで参加できるルームが存在しないなら、新規でルームを作成する
+        public override void OnJoinRandomFailed(short returnCode, string message) {
+            _joinedFailedRoom.OnNext(Unit.Default);
         }
     }
 }
