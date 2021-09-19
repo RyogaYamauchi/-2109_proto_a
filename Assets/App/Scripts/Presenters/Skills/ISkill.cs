@@ -6,5 +6,6 @@ namespace App.Skills
     public interface ISkill
     {
         public UniTask ExecuteAsync(TsumuRootPresenter presenter);
+        int GetNeedValue();
     }
 }

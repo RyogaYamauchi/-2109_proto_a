@@ -33,6 +33,7 @@ namespace App.Views
 
         [SerializeField] private TimerView timerView;
         [SerializeField] private BattleView battleView;
+        [SerializeField] private Slider _skillSlider;
 
         public IObservable<Unit> OnClickSkillAsObservable => _button.OnClickAsObservable().TakeUntilDestroy(this);
 
@@ -87,6 +88,18 @@ namespace App.Views
         public void SetParentTakeDamageNum(TsumuAttackNumView view)
         {
             view.transform.SetParent(_takeDamageNumRoot.transform, false);
+        }
+
+        public void SetSkillValue(int value, int max)
+        {
+            _skillSlider.minValue = 0;
+            _skillSlider.maxValue = max;
+            _skillSlider.value = value;
+        }
+
+        public void SetActiveSkillButton(bool state)
+        {
+            _button.interactable = state;
         }
     }
 }
