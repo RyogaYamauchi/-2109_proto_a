@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -8,6 +9,8 @@ namespace App.Lib
     {
         protected bool IsLoading;
         protected bool IsLoaded;
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        protected CancellationToken _cancellationToken => _cancellationTokenSource.Token;
 
         public void SetLoading(bool state)
         {
@@ -42,6 +45,7 @@ namespace App.Lib
 
         public void Dispose()
         {
+            _cancellationTokenSource.Cancel();
             Destroy(gameObject);
         }
     }
