@@ -16,6 +16,7 @@ namespace App.Views
     public class TsumuView : ViewBase
     {
         [SerializeField] private Button _button;
+        [SerializeField] private GameObject _deleteParticle;
 
         private readonly Subject<TsumuView> _onPointerDownSubject = new Subject<TsumuView>();
         private readonly Subject<TsumuView> _onPointerEnterSubject = new Subject<TsumuView>();
@@ -42,7 +43,7 @@ namespace App.Views
 
         public void ChangeColor(bool state)
         {
-            _button.image.color = state ? Color.black : Color.white;
+            _button.image.color = state ? new Color(1,1,1, 0.5f) : Color.white;
         }
 
         public void Initialize(TsumuViewModel viewModel,  Vector2 position)
@@ -57,10 +58,14 @@ namespace App.Views
             _button.image = _instance.GetComponent<Image>();
         }
 
-        public UniTask CloseAsync()
+        public async UniTask CloseAsync()
         {
+            var pos = transform.position;
             Dispose();
-            return UniTask.CompletedTask;
+            var particle = Instantiate(_deleteParticle);
+            particle.transform.position = new Vector3(pos.x, pos.y, pos.z - 10);//UIよりパーティクルを前に表示させる
+            await UniTask.Delay(500);
+            Destroy(particle);
         }
 
         public Vector3 GetPosition()

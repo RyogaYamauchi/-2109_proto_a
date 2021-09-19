@@ -27,6 +27,7 @@ namespace App.Presenters
         private TsumuRootModel _tsumuRootModel => _gameModel.TsumuRootModel;
         private List<TsumuView> _tsumuViewList = new List<TsumuView>();
         private List<Vector2> _canSpawnTsumuPoints = new List<Vector2>();
+        private List<TsumuView> _closingViewList = new List<TsumuView>();
 
         private ISkill _skill;
 
@@ -140,8 +141,10 @@ namespace App.Presenters
 
         private async UniTask DespawnTsumuAsync(TsumuView tsumuView)
         {
+            _closingViewList.Add(tsumuView);
             _tsumuViewList.Remove(tsumuView);
             await tsumuView.CloseAsync();
+            _closingViewList.Remove(tsumuView);
         }
 
         private void OnPointerEntertsumu(TsumuView view)
@@ -163,7 +166,7 @@ namespace App.Presenters
             }
 
             DespawnSelectingTsumusAsync().Forget();
-            UnSelectTsumuAll();
+            _gameModel.TsumuRootModel.UnSelectTsumuAll();
             return UniTask.CompletedTask;
         }
 
@@ -185,6 +188,12 @@ namespace App.Presenters
             {
                 return false;
             }
+
+            if (_closingViewList.Any(x => x == view))
+            {
+                return false;
+            }
+            
             var lastView = _tsumuViewList.FirstOrDefault(x => x.Guid == lastGuid);
             var difference = lastView.GetPosition() - view.GetPosition();
             var modelState = _tsumuRootModel.CanSelect(view.Guid);
