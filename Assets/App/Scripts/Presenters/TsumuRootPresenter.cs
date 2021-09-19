@@ -54,12 +54,15 @@ namespace App.Presenters
         {
             _gameModel.TsumuRootModel.Initialize();
             _skill = _gameModel.SkillModel.GetRandomSkill();
+            _gameModel.SkillModel.Initialize(_skill.GetNeedValue());
             _canSpawnTsumuPoints = new List<Vector2>(_spawnPoint);
-            // _gameModel.PlayerParameter.Health.Subscribe(x =>
-            // {
-            //     _mainRootView.SetHp(_gameModel.PlayerParameter.Health.Value, _gameModel.PlayerParameter.MaxHealth);
-            // }).AddTo(_mainRootView);
-            // DebugReceiveDamage().Forget();
+
+            _gameModel.SkillModel.SkillPoint.Subscribe(x =>
+            {
+                _mainRootView.SetSkillValue(_gameModel.SkillModel.SkillPoint.Value, _gameModel.SkillModel.MaxSkillPoint);
+            }).AddTo(_mainRootView);
+            _mainRootView.SetActiveSkillButton(false);
+            DebugReceiveDamage().Forget();
         }
 
         private async UniTask DebugReceiveDamage()
@@ -100,6 +103,8 @@ namespace App.Presenters
 
         private async UniTask UseSkillAsync(ISkill skill)
         {
+            _gameModel.SkillModel.ClearSkillPoint();
+            _mainRootView.SetActiveSkillButton(false);
             await skill.ExecuteAsync(this);
         }
         
@@ -143,10 +148,16 @@ namespace App.Presenters
         private async UniTask DespawnSelectingTsumusAsync()
         {
             var ids = _tsumuRootModel.GetSelectingTsumuIdList();
+            var chain = ids.Count;
             var views = _tsumuViewList.Where(x => ids.Contains(x.Guid)).ToArray();
             foreach (var view in views)
             {
+                _gameModel.SkillModel.AddSkillPoint(1);
                 await DespawnTsumuAsync(view);
+                if (_gameModel.SkillModel.CanExecuteSkill(_skill))
+                {
+                    _mainRootView.SetActiveSkillButton(true);
+                }
             }
 
             if (views[1].TsumuType == TsumuType.Heal)

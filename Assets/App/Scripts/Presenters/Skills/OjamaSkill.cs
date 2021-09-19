@@ -14,6 +14,7 @@ namespace App.Skills
 {
     public class OjamaSkill : ISkill
     {
+        private readonly int NeedValue = 30;
         private List<TsumuData> LoadTsumuData()
         {
             return Resources.LoadAll<TsumuData>("MasterData/").ToList();
@@ -48,6 +49,11 @@ namespace App.Skills
                 var viewModel = new TsumuViewModel(tsumuData, pair.view.Guid);
                 pair.view.Initialize(viewModel, pair.view.transform.position);
             }
+        }
+
+        public int GetNeedValue()
+        {
+            return NeedValue;
         }
     }
 }
