@@ -8,13 +8,14 @@ namespace App.Presenters
 {
     public class ResultRootPresenter : RootPresenterBase
     {
-        public ResultRootPresenter(ResultRootView rootView)
+        public ResultRootPresenter(ResultRootView rootView,bool winOrLose)
         {
             //view.OnClickTitle.Subscribe(x => ChangeScene<Title>);
             rootView.OnClickRetry.Subscribe(x =>
             {
                 ChangeScene<MainRootView>(new MainRootView.Paramater(30, 100)).Forget();
             });
+            rootView.PlayBGM(winOrLose);
         }
     }
 }
