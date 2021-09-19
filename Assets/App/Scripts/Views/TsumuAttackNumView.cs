@@ -17,8 +17,8 @@ namespace App.Views
 
         public async UniTask MoveToTarget(Vector3 position)
         {
-            await transform.DOLocalMoveY(transform.localPosition.y + 20, 1);
-            await transform.DOMove(position, 1);
+            await transform.DOLocalMoveY(transform.localPosition.y + 20, 1).WithCancellation(_cancellationToken);
+            await transform.DOMove(position, 1).WithCancellation(_cancellationToken);
         }
     }
 }

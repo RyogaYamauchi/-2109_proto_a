@@ -31,11 +31,7 @@ namespace App.Views
         public TsumuType TsumuType => _tsumuViewModel.TsumuData.TsumuType;
         public Guid Guid => _tsumuViewModel.Guid;
         private GameObject _instance;
-        
-        
-        
 
-        
         public override UniTask OnLoadAsync()
         {
             _button.OnPointerEnterAsObservable().Subscribe(x => _onPointerEnterSubject.OnNext(this)).AddTo(this);
@@ -73,7 +69,7 @@ namespace App.Views
         {
             var particle = Instantiate(_deleteParticle);
             particle.transform.position = new Vector3(pos.x, pos.y, pos.z - 10);//UIよりパーティクルを前に表示させる
-            await UniTask.Delay(500);
+            await UniTask.Delay(500);//, cancellationToken: _cancellationToken);
             Destroy(particle);
         }
 
