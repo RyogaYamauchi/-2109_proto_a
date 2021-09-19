@@ -143,6 +143,13 @@ namespace App.Presenters
         {
             _closingViewList.Add(tsumuView);
             _tsumuViewList.Remove(tsumuView);
+            var damageView = await CreateViewAsync<TsumuAttackNumView>();
+            _mainRootView.SetParentTakeDamageNum(damageView);
+            var pos = tsumuView.transform.position;
+            damageView.transform.position = pos;
+            var damage = _tsumuRootModel.GetDamage(tsumuView.TsumuType);
+            damageView.Initialize(damage);
+            damageView.MoveToTarget(_mainRootView.GetEnemyPosition()).Forget();
             await tsumuView.CloseAsync();
             _closingViewList.Remove(tsumuView);
         }
@@ -195,7 +202,7 @@ namespace App.Presenters
             }
             
             var lastView = _tsumuViewList.FirstOrDefault(x => x.Guid == lastGuid);
-            var difference = lastView.GetPosition() - view.GetPosition();
+            var difference = lastView.GetLocalPosition() - view.GetLocalPosition();
             var modelState = _tsumuRootModel.CanSelect(view.Guid);
 
             if (!modelState)

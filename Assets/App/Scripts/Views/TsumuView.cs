@@ -68,7 +68,7 @@ namespace App.Views
             Destroy(particle);
         }
 
-        public Vector3 GetPosition()
+        public Vector3 GetLocalPosition()
         {
             return transform.localPosition;
         }

@@ -28,6 +28,8 @@ namespace App.Views
         [SerializeField] private Transform _tsumuSpawnRoot;
         [SerializeField] private Transform _tsumuRoot;
         [SerializeField] private Slider _hpSlider;
+        [SerializeField] private GameObject _enemyObject;
+        [SerializeField] private GameObject _takeDamageNumRoot;
 
         [SerializeField] private TimerView timerView;
         [SerializeField] private BattleView battleView;
@@ -75,6 +77,16 @@ namespace App.Views
             _hpSlider.minValue = 0;
             _hpSlider.maxValue = maxValue;
             _hpSlider.value = value;
+        }
+
+        public Vector3 GetEnemyPosition()
+        {
+            return _enemyObject.transform.position;
+        }
+
+        public void SetParentTakeDamageNum(TsumuAttackNumView view)
+        {
+            view.transform.SetParent(_takeDamageNumRoot.transform, false);
         }
     }
 }

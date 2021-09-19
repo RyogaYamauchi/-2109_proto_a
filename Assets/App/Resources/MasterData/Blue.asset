@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _tsumuType: 2
   _colliderGameObject: {fileID: 5684856827884847655, guid: e60608f07ceb4db48a033db75f99b492, type: 3}
+  _attackPoint: 1
