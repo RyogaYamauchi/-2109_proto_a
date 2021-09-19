@@ -15,18 +15,28 @@ namespace App.Lib
             var path = PrefabPath.GetPrefabPath(typeof(T));
             var obj = await Resources.LoadAsync<T>(path) as T;
             var instance = Object.Instantiate(obj, parent, false);
+            instance.SetLoading(true);
             await instance.LoadAsync();
             await instance.DidLoadAsync();
+            instance.SetLoading(false);
+            instance.SetLoaded(true);
             return instance;
         }
 
-        protected async UniTask<T> ChangeScene<T>() where T : RootViewBase
+        protected async UniTask<T> ChangeScene<T>(IParameter parameter = null) where T : RootViewBase
         {
             var type = typeof(T);
             var name = RootSceneName.GetRootSceneName(type);
             SceneManager.sceneLoaded += GetRootViewBase<T>;
             await SceneManager.LoadSceneAsync(name);
             SceneManager.sceneLoaded -= GetRootViewBase<T>;
+            var rootViewBase = (T) _rootViewBase;
+            rootViewBase.SetParameter(parameter);
+            rootViewBase.SetLoading(true);
+            await _rootViewBase.LoadAsync();
+            await rootViewBase.DidLoadAsync();
+            rootViewBase.SetLoading(false);
+            rootViewBase.SetLoaded(true);
             return (T) _rootViewBase;
         }
 

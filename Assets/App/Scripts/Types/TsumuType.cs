@@ -9,6 +9,7 @@ namespace App.Types
         Green,
         Blue,
         Yellow,
+        Heal,
     }
 
     public class TsumuColor
@@ -25,6 +26,8 @@ namespace App.Types
                     return Color.green;
                 case TsumuType.Yellow:
                     return Color.yellow;
+                case TsumuType.Heal:
+                    return Color.magenta;
             }
 
             throw new ArgumentException($"指定されたTypeに対する色がありません{type}");
