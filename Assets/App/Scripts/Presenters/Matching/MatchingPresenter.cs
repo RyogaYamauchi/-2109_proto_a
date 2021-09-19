@@ -4,9 +4,11 @@ using Photon.Realtime;
 using UniRx;
 using UnityEngine;
 using App.Lib;
-using UnityEngine.Serialization;
+using App.View.Matching;
+using App.Views;
+using Cysharp.Threading.Tasks;
 
-namespace App.Matching
+namespace App.Presenters.Matching
 {
     public class MatchingPresenter : PresenterBase
     {
@@ -122,6 +124,7 @@ namespace App.Matching
         private  void ChangeSceneToMain()
         {
             Debug.Log("main");
+            ChangeScene<TestMainView>().Forget();
         }
 
     }

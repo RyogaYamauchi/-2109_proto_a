@@ -60,4 +60,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Enami/Matching/Matching.unity
     guid: 3df5cd79f51f71f498849b2d13d4fa3f
+  - enabled: 1
+    path: Assets/Enami/TestMain/TestMain.unity
+    guid: c66e11df8561d0f40a39bc53e6454e2f
+  - enabled: 0
+    path: Assets/App/Scenes/MainScene.unity
+    guid: a8c863582fc28ad40a8aebe7981c01f3
   m_configObjects: {}
