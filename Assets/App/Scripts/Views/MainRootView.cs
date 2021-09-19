@@ -40,7 +40,7 @@ namespace App.Views
             {
                 // デバッグではDeleteLineSkillを使用
                 Debug.Log("OnPlayDebug");
-                var presenter = new TsumuRootPresenter(this, new Paramater(30, new DeleteLineSkill()));
+                var presenter = new TsumuRootPresenter(this, new Paramater(30, new OjamaSkill()));
                 presenter.Initialize();
                 
                 var battlePresenter = new BattlePresenter(presenter, timerView, battleView);
