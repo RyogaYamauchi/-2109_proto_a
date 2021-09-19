@@ -47,7 +47,7 @@ namespace App.Views
 
         public void Initialize(TsumuViewModel viewModel,  Vector2 position)
         {
-            transform.position = position;
+            transform.localPosition = position;
             _tsumuViewModel = viewModel;
             if(_instance != null)
             {

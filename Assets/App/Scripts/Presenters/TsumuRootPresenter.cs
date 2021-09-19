@@ -20,8 +20,8 @@ namespace App.Presenters
         private readonly int _canSelectDistance = 300;
         private readonly Vector2[] _spawnPoint =
         {
-            new Vector2(-300, 0), new Vector2(-200, 0), new Vector2(-100, 0),
-            new Vector2(0, 0), new Vector2(100, 0), new Vector2(200, 0), new Vector2(300, 0)
+            new Vector2(-225, 0), new Vector2(-150, 0), new Vector2(-75, 0),
+            new Vector2(0, 0), new Vector2(75, 0), new Vector2(150, 0), new Vector2(225, 0)
         };
 
         private TsumuRootModel _tsumuRootModel => _gameModel.TsumuRootModel;
@@ -93,6 +93,7 @@ namespace App.Presenters
         
         private async UniTask SpawnTsumuAsync()
         {
+            var spawnPointY = Screen.height / 2;
             _canSpawnTsumuPoints = _canSpawnTsumuPoints.OrderBy(x => Guid.NewGuid()).ToList();
             var spawnPoint = _canSpawnTsumuPoints.FirstOrDefault();
             _canSpawnTsumuPoints.Remove(spawnPoint);
@@ -100,7 +101,7 @@ namespace App.Presenters
             var tsumuView = await CreateViewAsync<TsumuView>();
             _mainRootView.SetParentTsumu(tsumuView);
             var spawnRootPosition = _mainRootView.GetSpawnRootPosition();
-            tsumuView.Initialize(viewModel,  new Vector2(spawnRootPosition.x + spawnPoint.x, spawnRootPosition.y));
+            tsumuView.Initialize(viewModel,  new Vector2(spawnRootPosition.x + spawnPoint.x, spawnPointY));
             tsumuView.OnPointerEnterAsObservable.Subscribe(OnPointerEntertsumu);
             tsumuView.OnPointerDownAsObservable.Subscribe(OnPointerDownTsumu);
             tsumuView.OnPointerUpAsObservable.Subscribe(x => OnPointerUpTsumu(x).Forget());
