@@ -10,6 +10,7 @@ namespace App.Types
         Blue,
         Yellow,
         Heal,
+        Ojama
     }
 
     public class TsumuColor

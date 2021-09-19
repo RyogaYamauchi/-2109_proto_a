@@ -28,6 +28,7 @@ namespace App.Views
         private TsumuViewModel _tsumuViewModel;
         public TsumuType TsumuType => _tsumuViewModel.TsumuData.TsumuType;
         public Guid Guid => _tsumuViewModel.Guid;
+        private GameObject _instance;
         
 
         
@@ -46,10 +47,14 @@ namespace App.Views
 
         public void Initialize(TsumuViewModel viewModel,  Vector2 position)
         {
-            _tsumuViewModel = viewModel;
-            var instance = Instantiate(viewModel.ColiderObject, transform, false);
-            _button.image = instance.GetComponent<Image>();
             transform.position = position;
+            _tsumuViewModel = viewModel;
+            if(_instance != null)
+            {
+                Destroy(_instance);
+            }
+            _instance = Instantiate(viewModel.ColiderObject, transform, false);
+            _button.image = _instance.GetComponent<Image>();
         }
 
         public UniTask CloseAsync()

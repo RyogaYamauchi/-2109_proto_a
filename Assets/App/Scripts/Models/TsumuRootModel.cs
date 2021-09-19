@@ -16,7 +16,7 @@ namespace App.Models
         
         private List<TsumuData> LoadTsumuData()
         {
-            return Resources.LoadAll<TsumuData>("MasterData/").ToList();
+            return Resources.LoadAll<TsumuData>("MasterData/").Where(x => x.TsumuType != Types.TsumuType.Ojama).ToList();
         }
 
         private TsumuModel GetModel(Guid guid)
