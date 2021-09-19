@@ -32,9 +32,10 @@ namespace App.Views
         // デバッグ機能、シーン単体で起動できる
         private void Start()
         {
-            if (!IsLoading || !IsLoaded)
+            if (!IsLoading && !IsLoaded)
             {
                 // デバッグではDeleteLineSkillを使用
+                Debug.Log("OnPlayDebug");
                 var presenter = new TsumuRootPresenter(this, new Paramater(30, new DeleteLineSkill()));
                 presenter.Initialize();
             }

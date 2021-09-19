@@ -13,9 +13,10 @@ namespace App.Presenters
     {
         public TitleRootPresenter(TitleRootView rootView)
         {
-            rootView.OnClickOnline.Subscribe(x => {
-                Debug.Log("あ");
-                ChangeScene<MainRootView>(new MainRootView.Paramater(30, new DeleteLineSkill())).Forget(); });
+            rootView.OnClickOnline.Subscribe(x =>
+            {
+                ChangeScene<MainRootView>(new MainRootView.Paramater(30, new DeleteLineSkill())).Forget();
+            });
         }
     }
 }
