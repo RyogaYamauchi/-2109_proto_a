@@ -84,6 +84,10 @@ namespace App.Presenters
             {
                 RefillTsumus();
             }).AddTo(_mainRootView);
+            _mainRootView.OnClickGoTitleButtonAsObservable.Subscribe(x =>
+            {
+                ChangeScene<TitleRootView>().Forget();
+            });
         }
         
         private void RefillTsumus()
