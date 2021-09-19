@@ -20,13 +20,14 @@ namespace App.Presenters
         private readonly int _canSelectDistance = 300;
         private readonly Vector2[] _spawnPoint =
         {
-            new Vector2(-300, 0), new Vector2(-200, 0), new Vector2(-100, 0),
-            new Vector2(0, 0), new Vector2(100, 0), new Vector2(200, 0), new Vector2(300, 0)
+            new Vector2(-225, 0), new Vector2(-150, 0), new Vector2(-75, 0),
+            new Vector2(0, 0), new Vector2(75, 0), new Vector2(150, 0), new Vector2(225, 0)
         };
 
         private TsumuRootModel _tsumuRootModel => _gameModel.TsumuRootModel;
         private List<TsumuView> _tsumuViewList = new List<TsumuView>();
         private List<Vector2> _canSpawnTsumuPoints = new List<Vector2>();
+        private List<TsumuView> _closingViewList = new List<TsumuView>();
 
         private ISkill _skill;
 
@@ -93,6 +94,7 @@ namespace App.Presenters
         
         private async UniTask SpawnTsumuAsync()
         {
+            var spawnPointY = Screen.height / 2;
             _canSpawnTsumuPoints = _canSpawnTsumuPoints.OrderBy(x => Guid.NewGuid()).ToList();
             var spawnPoint = _canSpawnTsumuPoints.FirstOrDefault();
             _canSpawnTsumuPoints.Remove(spawnPoint);
@@ -100,7 +102,7 @@ namespace App.Presenters
             var tsumuView = await CreateViewAsync<TsumuView>();
             _mainRootView.SetParentTsumu(tsumuView);
             var spawnRootPosition = _mainRootView.GetSpawnRootPosition();
-            tsumuView.Initialize(viewModel,  new Vector2(spawnRootPosition.x + spawnPoint.x, spawnRootPosition.y));
+            tsumuView.Initialize(viewModel,  new Vector2(spawnRootPosition.x + spawnPoint.x, spawnPointY));
             tsumuView.OnPointerEnterAsObservable.Subscribe(OnPointerEntertsumu);
             tsumuView.OnPointerDownAsObservable.Subscribe(OnPointerDownTsumu);
             tsumuView.OnPointerUpAsObservable.Subscribe(x => OnPointerUpTsumu(x).Forget());
@@ -139,8 +141,24 @@ namespace App.Presenters
 
         private async UniTask DespawnTsumuAsync(TsumuView tsumuView)
         {
+            _closingViewList.Add(tsumuView);
             _tsumuViewList.Remove(tsumuView);
+           
+            var pos = tsumuView.transform.position;
+            PlayDamageView(pos, tsumuView).Forget();
             await tsumuView.CloseAsync();
+            _closingViewList.Remove(tsumuView);
+        }
+
+        private async UniTask PlayDamageView(Vector3 pos, TsumuView tsumuView)
+        {
+            var damageView = await CreateViewAsync<TsumuAttackNumView>();
+            _mainRootView.SetParentTakeDamageNum(damageView);
+            damageView.transform.position = pos;
+            var damage = _tsumuRootModel.GetDamage(tsumuView.TsumuType);
+            damageView.Initialize(damage);
+            await damageView.MoveToTarget(_mainRootView.GetEnemyPosition());
+            damageView.Dispose();
         }
 
         private void OnPointerEntertsumu(TsumuView view)
@@ -162,7 +180,7 @@ namespace App.Presenters
             }
 
             DespawnSelectingTsumusAsync().Forget();
-            UnSelectTsumuAll();
+            _gameModel.TsumuRootModel.UnSelectTsumuAll();
             return UniTask.CompletedTask;
         }
 
@@ -184,8 +202,14 @@ namespace App.Presenters
             {
                 return false;
             }
+
+            if (_closingViewList.Any(x => x == view))
+            {
+                return false;
+            }
+            
             var lastView = _tsumuViewList.FirstOrDefault(x => x.Guid == lastGuid);
-            var difference = lastView.GetPosition() - view.GetPosition();
+            var difference = lastView.GetLocalPosition() - view.GetLocalPosition();
             var modelState = _tsumuRootModel.CanSelect(view.Guid);
 
             if (!modelState)

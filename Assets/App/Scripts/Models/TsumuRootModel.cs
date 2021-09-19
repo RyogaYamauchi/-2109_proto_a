@@ -14,10 +14,18 @@ namespace App.Models
         private List<TsumuModel> _tsumuList = new List<TsumuModel>();
         private List<Guid> _selectingTsumuIdList = new List<Guid>();
         private List<TsumuData> _tsumuDataList = new List<TsumuData>();
+
+        private List<TsumuData> _cacheTsumuData = new List<TsumuData>();
         
         private List<TsumuData> LoadTsumuData()
         {
-            return Resources.LoadAll<TsumuData>("MasterData/").Where(x => x.TsumuType != Types.TsumuType.Ojama).ToList();
+            if (_cacheTsumuData.Count == 0)
+            {
+                _cacheTsumuData =  Resources.LoadAll<TsumuData>("MasterData/")
+                    .Where(x => x.TsumuType != TsumuType.Ojama).ToList();
+            }
+
+            return _cacheTsumuData;
         }
 
         private TsumuModel GetModel(Guid guid)
@@ -27,7 +35,6 @@ namespace App.Models
         public void Initialize()
         {
             _tsumuDataList = LoadTsumuData();
-
         }
         
      
@@ -96,6 +103,11 @@ namespace App.Models
             _tsumuList.Remove(currentModel);
             var changedModel = new TsumuModel(changedGuid, tsumuData);
             _tsumuList.Add(changedModel);
+        }
+
+        public int GetDamage(TsumuType tsumuType)
+        {
+            return LoadTsumuData().FirstOrDefault(x => x.TsumuType == tsumuType).AttackPoint;
         }
     }
 }

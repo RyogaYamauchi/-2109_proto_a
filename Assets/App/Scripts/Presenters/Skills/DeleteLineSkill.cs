@@ -15,7 +15,7 @@ namespace App.Skills
             var tsumuList = tsumuRootPresenter.GetReadOnLyTsumuList();
             var targetTsumuList = tsumuList.Where(tsumuView =>
             {
-                var pos = tsumuView.GetPosition();
+                var pos = tsumuView.GetLocalPosition();
                 return pos.y < YRange && pos.y > -YRange;
             }).ToList();
             await tsumuRootPresenter.DespawnTsumuListAsync(targetTsumuList);

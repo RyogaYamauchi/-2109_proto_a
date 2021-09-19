@@ -60,6 +60,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _button: {fileID: 6324876193390470708}
+  _deleteParticle: {fileID: 4653958010180704148, guid: 309c87f824fcf394da7e8cdb2be7556e, type: 3}
 --- !u!114 &6324876193390470708
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -119,7 +120,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 100
+  m_GravityScale: 7
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
