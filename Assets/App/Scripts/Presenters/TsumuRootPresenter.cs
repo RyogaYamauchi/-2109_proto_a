@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using App.Lib;
 using App.Models;
 using App.Skills;
+using App.Types;
 using App.Views;
 using Cysharp.Threading.Tasks;
 using UniRx;
@@ -30,6 +31,16 @@ namespace App.Presenters
         private List<TsumuView> _closingViewList = new List<TsumuView>();
 
         private ISkill _skill;
+        
+        // 攻撃ツム消した数
+        private readonly ReactiveProperty<int> _attackTsumuNumReactiveProperty = new ReactiveProperty<int>(0);
+        public IObservable<int> AttackTsumuNumObservable => _attackTsumuNumReactiveProperty;
+        
+        // 回復ツム消した数
+        private readonly ReactiveProperty<int> _healTsumuNumReactiveProperty = new ReactiveProperty<int>(0);
+        public IObservable<int> HealTsumuNumObservable => _healTsumuNumReactiveProperty;
+        
+        
 
         public TsumuRootPresenter(MainRootView view, IParameter parameter)
         {
@@ -45,10 +56,7 @@ namespace App.Presenters
             _skill = _gameModel.SkillModel.GetRandomSkill();
             _gameModel.SkillModel.Initialize(_skill.GetNeedValue());
             _canSpawnTsumuPoints = new List<Vector2>(_spawnPoint);
-            _gameModel.PlayerParameter.Health.Subscribe(x =>
-            {
-                _mainRootView.SetHp(_gameModel.PlayerParameter.Health.Value, _gameModel.PlayerParameter.MaxHealth);
-            }).AddTo(_mainRootView);
+
             _gameModel.SkillModel.SkillPoint.Subscribe(x =>
             {
                 _mainRootView.SetSkillValue(_gameModel.SkillModel.SkillPoint.Value, _gameModel.SkillModel.MaxSkillPoint);
@@ -150,6 +158,15 @@ namespace App.Presenters
                 {
                     _mainRootView.SetActiveSkillButton(true);
                 }
+            }
+
+            if (views[1].TsumuType == TsumuType.Heal)
+            {
+                _healTsumuNumReactiveProperty.Value = ids.Count;
+            }
+            else
+            {
+                _attackTsumuNumReactiveProperty.Value = ids.Count;
             }
         }
 

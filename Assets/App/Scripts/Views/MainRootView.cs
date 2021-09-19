@@ -48,8 +48,8 @@ namespace App.Views
                 presenter.Initialize();
                 presenter.SetEvents();
                 
-                var battlePresenter = new BattlePresenter(presenter, timerView, battleView);
-                battlePresenter.Initialize();
+                // var battlePresenter = new BattlePresenter(presenter, timerView, battleView);
+                // battlePresenter.Initialize();
             }
         }
 

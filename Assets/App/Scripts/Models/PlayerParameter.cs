@@ -41,6 +41,20 @@ namespace App.Models
 
             _health.Value = newHealth;
         }
+        
+        public void Recover(float addHealth)
+        {
+            var nowHealth = _health.Value;
+
+            var newHealth = nowHealth + addHealth;
+
+            if (newHealth > MaxHealth)
+            {
+                newHealth = MaxHealth;
+            }
+
+            _health.Value = newHealth;
+        }
     }
 }
 
