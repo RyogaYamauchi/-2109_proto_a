@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using App.MasterData;
+using App.Types;
 using App.ViewModels;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -60,6 +61,11 @@ namespace App.Models
             var lastGuid = _selectingTsumuIdList.Last();
             var lastModel = GetModel(lastGuid);
             var targetModel = GetModel(guid);
+
+            if (targetModel.TsumuData.TsumuType == TsumuType.Ojama)
+            {
+                return false;
+            }
             
             if (lastModel.TsumuData.TsumuType != targetModel.TsumuData.TsumuType)
             {
@@ -83,6 +89,13 @@ namespace App.Models
         {
             return GetSelectingTsumuCount();
         }
-        
+
+        public void ChangeStateTsumuModel(Guid currentGuid, Guid changedGuid, TsumuData tsumuData)
+        {
+            var currentModel = GetModel(currentGuid);
+            _tsumuList.Remove(currentModel);
+            var changedModel = new TsumuModel(changedGuid, tsumuData);
+            _tsumuList.Add(changedModel);
+        }
     }
 }

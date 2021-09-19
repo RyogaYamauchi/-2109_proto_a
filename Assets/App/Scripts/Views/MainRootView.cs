@@ -43,6 +43,7 @@ namespace App.Views
                 Debug.Log("OnPlayDebug");
                 var presenter = new TsumuRootPresenter(this, new Paramater(30, 300));
                 presenter.Initialize();
+                presenter.SetEvents();
                 
                 var battlePresenter = new BattlePresenter(presenter, timerView, battleView);
                 battlePresenter.Initialize();

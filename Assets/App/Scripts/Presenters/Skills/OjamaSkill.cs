@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
@@ -7,6 +6,8 @@ using System.Linq;
 using System;
 using App.ViewModels;
 using App.MasterData;
+using App.Models;
+using App.Types;
 
 
 namespace App.Skills
@@ -17,20 +18,36 @@ namespace App.Skills
         {
             return Resources.LoadAll<TsumuData>("MasterData/").ToList();
         }
-        public UniTask ExecuteAsync(TsumuRootPresenter presenter)
+
+        public async UniTask ExecuteAsync(TsumuRootPresenter presenter)
         {
             var tsumuList = presenter.GetReadOnLyTsumuList();
-            var targetTsumuList = tsumuList.OrderBy(x => Guid.NewGuid()).Take(5).ToList();
+            var maxOjamaTsumu = 5;
+            var canChangeTsumuCount = tsumuList.Count(x => x.TsumuType != TsumuType.Ojama);
+            var changeTsumuCount = maxOjamaTsumu <= canChangeTsumuCount ? maxOjamaTsumu : canChangeTsumuCount;
+            var targetTsumuList = tsumuList.OrderBy(x => Guid.NewGuid()).Where(x => x.TsumuType != TsumuType.Ojama).Take(changeTsumuCount).ToList();
 
-            var OajamaData = LoadTsumuData().FirstOrDefault(x => x.TsumuType == Types.TsumuType
-            .Ojama);
+            var tsumuDataList = LoadTsumuData();
 
-            foreach(var tsumuView in targetTsumuList)
+            var oajamaData = tsumuDataList.FirstOrDefault(x => x.TsumuType == Types.TsumuType.Ojama);
+            var pairs = targetTsumuList.Select(view => (view, view.TsumuType)).ToArray();
+
+            foreach (var tsumuView in targetTsumuList)
             {
-                var ViewModel = new TsumuViewModel(OajamaData,tsumuView.Guid);
-                tsumuView.Initialize(ViewModel,tsumuView.transform.position);
+                GameModel.Instance.TsumuRootModel.ChangeStateTsumuModel(tsumuView.Guid, tsumuView.Guid, oajamaData);
+                var viewModel = new TsumuViewModel(oajamaData, tsumuView.Guid);
+                tsumuView.Initialize(viewModel, tsumuView.transform.position);
             }
-            return UniTask.CompletedTask;
+
+            await UniTask.Delay(5000); // 5秒後に戻す
+
+            foreach (var pair in pairs)
+            {
+                var tsumuData = tsumuDataList.FirstOrDefault(x => x.TsumuType == pair.TsumuType);
+                GameModel.Instance.TsumuRootModel.ChangeStateTsumuModel(pair.view.Guid, pair.view.Guid, tsumuData);
+                var viewModel = new TsumuViewModel(tsumuData, pair.view.Guid);
+                pair.view.Initialize(viewModel, pair.view.transform.position);
+            }
         }
     }
 }
