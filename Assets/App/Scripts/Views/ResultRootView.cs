@@ -31,6 +31,12 @@ namespace App.Views
         private Text _resultText;
         [SerializeField]
         private Text _rateltText;
+        [SerializeField]
+        private AudioClip LoseSound;
+        [SerializeField]
+        private AudioClip WinSound;
+        [SerializeField]
+        private AudioSource audioSource;
         public IObservable<Unit> OnClickTitle => _titleButton.OnClickAsObservable().TakeUntilDestroy(this);
         public IObservable<Unit> OnClickRetry => _retryButton.OnClickAsObservable().TakeUntilDestroy(this);
         public GameObject loseEnemy;
@@ -39,8 +45,8 @@ namespace App.Views
         public override UniTask OnLoadAsync()
         {
             var param = ((Parameter) GetParameter());
-            var presenter = new ResultRootPresenter(this);
             var winOrLose = param.IsWinOrLose;
+            var presenter = new ResultRootPresenter(this,winOrLose);
             Debug.Log(winOrLose);
             //_rateltText.text = "1300";
             if (winOrLose == true)
@@ -56,6 +62,19 @@ namespace App.Views
                 loseEnemy.SetActive(true);
             }
             return base.OnLoadAsync();
+        }
+        public void PlayBGM(bool winOrLose)
+        {
+            if (winOrLose)
+            {
+                audioSource.PlayOneShot(WinSound);
+
+            }
+            else
+            {
+                audioSource.PlayOneShot(LoseSound);
+            }
+
         }
         
     }
