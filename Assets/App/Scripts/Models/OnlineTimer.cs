@@ -72,7 +72,7 @@ namespace App.Models
 
                 if (TotalTime <= 0)
                 {
-                    _isTimeUp = true;
+                    IsTimeUp = true;
                     break;
                 }
             }

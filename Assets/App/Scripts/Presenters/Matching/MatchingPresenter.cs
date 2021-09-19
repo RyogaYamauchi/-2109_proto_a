@@ -1,12 +1,14 @@
-using System;
+using App.Skills;
 using Photon.Pun;
 using Photon.Realtime;
 using UniRx;
 using UnityEngine;
 using App.Lib;
+using App.Models;
 using App.View.Matching;
 using App.Views;
 using Cysharp.Threading.Tasks;
+using ExitGames.Client.Photon.StructWrapping;
 
 namespace App.Presenters.Matching
 {
@@ -19,13 +21,7 @@ namespace App.Presenters.Matching
         public MatchingPresenter(MatchingStateView stateView)
         {
             _matchingStateView = stateView;
-            
-            _matchingStateView.InitializeAsyncSubject
-                .Subscribe(_ =>
-                {
-                   Init();
-                })
-                .AddTo(_matchingStateView);
+            Init();
         }
         
         private void Init()
@@ -124,7 +120,7 @@ namespace App.Presenters.Matching
         private  void ChangeSceneToMain()
         {
             Debug.Log("main");
-            ChangeScene<TestMainView>().Forget();
+            ChangeScene<MainRootView>(new MainRootView.Paramater(30, 300)).Forget();
         }
 
     }

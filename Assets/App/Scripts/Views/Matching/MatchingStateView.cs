@@ -3,11 +3,13 @@ using Photon.Pun;
 using Photon.Realtime;
 using UniRx;
 using App.Presenters.Matching;
+using App.Lib;
+using Cysharp.Threading.Tasks;
 
 
 namespace App.View.Matching
 {
-    public class MatchingStateView : MonoBehaviourPunCallbacks
+    public class MatchingStateView : PhotonViewBase
     {
         private readonly Subject<Unit> _initializeAsyncSubject = new Subject<Unit>();
         public IObservable<Unit> InitializeAsyncSubject => _initializeAsyncSubject;
@@ -25,17 +27,20 @@ namespace App.View.Matching
         public IObservable<Unit> ChangeScene => _changeScene;
 
         private MatchingPresenter _matchingPresenter;
-        void Start()
-        {
-            Initialize();
-        }
 
-        private void Initialize()
-        {
-            _matchingPresenter = new MatchingPresenter(this);
-            _initializeAsyncSubject.OnNext(Unit.Default);
-            _initializeAsyncSubject.OnCompleted();
-        }
+        private bool _isChange = false;
+        // public override UniTask OnLoadAsync()
+        // {
+        //     Initialize();
+        //     return base.OnLoadAsync();
+        // }
+
+        // private void Initialize()
+        // {
+        //     _matchingPresenter = new MatchingPresenter(this);
+        //     _initializeAsyncSubject.OnNext(Unit.Default);
+        //     _initializeAsyncSubject.OnCompleted();
+        // }
         
         // マスターサーバーへの接続が成功した時に呼ばれるコールバック
         public override void OnConnectedToMaster() {
@@ -59,8 +64,10 @@ namespace App.View.Matching
         {
             if (propertiesThatChanged.TryGetValue("scene_state", out var value))
             {
+                if (_isChange) return;
                 if ((string)value == SceneState.SceneStateType.Main.ToString())
                 {
+                    _isChange = true;
                     _changeScene.OnNext(Unit.Default);
                 }
             }

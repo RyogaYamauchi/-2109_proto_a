@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace App.Lib
 {
-    public abstract class ViewBase : MonoBehaviour, IDisposable
+    public abstract class ViewBase : MonoBehaviour, IDisposable, IViewBase
     {
         protected bool IsLoading;
         protected bool IsLoaded;
@@ -19,12 +19,12 @@ namespace App.Lib
             IsLoaded = state;
         }
 
-        protected virtual UniTask OnLoadAsync()
+        public virtual UniTask OnLoadAsync()
         {
             return UniTask.CompletedTask;
         }
 
-        protected virtual UniTask OnDidLoadAsync()
+        public virtual UniTask OnDidLoadAsync()
         {
             return UniTask.CompletedTask;
         }

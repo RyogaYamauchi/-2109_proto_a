@@ -5,6 +5,7 @@ using App.Skills;
 using Cysharp.Threading.Tasks;
 using UniRx;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace App.Views
@@ -15,13 +16,11 @@ namespace App.Views
         public class Paramater : IParameter
         {
             public int MaxTsumuCount;
-            public ISkill Skill;
             public int MaxHp;
 
-            public Paramater(int maxTsumuCount, ISkill skill, int maxHp)
+            public Paramater(int maxTsumuCount, int maxHp)
             {
                 MaxTsumuCount = maxTsumuCount;
-                Skill = skill;
                 MaxHp = maxHp;
             }
         }
@@ -29,6 +28,9 @@ namespace App.Views
         [SerializeField] private Transform _tsumuSpawnRoot;
         [SerializeField] private Transform _tsumuRoot;
         [SerializeField] private Slider _hpSlider;
+
+        [SerializeField] private TimerView timerView;
+        [SerializeField] private BattleView battleView;
 
         public IObservable<Unit> OnClickSkillAsObservable => _button.OnClickAsObservable().TakeUntilDestroy(this);
 
@@ -39,15 +41,21 @@ namespace App.Views
             {
                 // デバッグではDeleteLineSkillを使用
                 Debug.Log("OnPlayDebug");
-                var presenter = new TsumuRootPresenter(this, new Paramater(30, new DeleteLineSkill(), 300));
+                var presenter = new TsumuRootPresenter(this, new Paramater(30, 300));
                 presenter.Initialize();
+                
+                var battlePresenter = new BattlePresenter(presenter, timerView, battleView);
+                battlePresenter.Initialize();
             }
         }
 
-        protected override UniTask OnLoadAsync()
+        public override UniTask OnLoadAsync()
         {
             var presenter = new TsumuRootPresenter(this, Parameter);
             presenter.Initialize();
+            
+            var battlePresenter = new BattlePresenter(presenter, timerView, battleView);
+            battlePresenter.Initialize();
             return base.OnLoadAsync();
         }
         

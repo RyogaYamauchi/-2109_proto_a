@@ -5,6 +5,7 @@ using UniRx;
 using Cysharp.Threading.Tasks;
 using App.Lib;
 using App.Skills;
+using App.View.Matching;
 using App.Views;
 
 namespace App.Presenters
@@ -15,7 +16,7 @@ namespace App.Presenters
         {
             rootView.OnClickOnline.Subscribe(x =>
             {
-                ChangeScene<MainRootView>(new MainRootView.Paramater(30, new DeleteLineSkill(), 100)).Forget();
+                ChangeScene<MatchingRootView>().Forget();
             });
         }
     }
