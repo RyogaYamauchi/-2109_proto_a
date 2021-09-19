@@ -42,7 +42,7 @@ namespace App.Views
 
         public void ChangeColor(bool state)
         {
-            _button.image.color = state ? Color.black : TsumuColor.ConvertTsumuColor(TsumuType);
+            _button.image.color = state ? Color.black : Color.white;
         }
 
         public void Initialize(TsumuViewModel viewModel,  Vector2 position)
