@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using App.Lib;
 using App.Models;
 using App.Skills;
+using App.Types;
 using App.Views;
 using Cysharp.Threading.Tasks;
 using UniRx;
@@ -29,6 +30,16 @@ namespace App.Presenters
         private List<Vector2> _canSpawnTsumuPoints = new List<Vector2>();
 
         private ISkill _skill;
+        
+        // 攻撃ツム消した数
+        private readonly ReactiveProperty<int> _attackTsumuNumReactiveProperty = new ReactiveProperty<int>(0);
+        public IObservable<int> AttackTsumuNumObservable => _attackTsumuNumReactiveProperty;
+        
+        // 回復ツム消した数
+        private readonly ReactiveProperty<int> _healTsumuNumReactiveProperty = new ReactiveProperty<int>(0);
+        public IObservable<int> HealTsumuNumObservable => _healTsumuNumReactiveProperty;
+        
+        
 
         public TsumuRootPresenter(MainRootView view, IParameter parameter)
         {
@@ -43,11 +54,11 @@ namespace App.Presenters
             _gameModel.TsumuRootModel.Initialize();
             _skill = _gameModel.SkillModel.GetRandomSkill();
             _canSpawnTsumuPoints = new List<Vector2>(_spawnPoint);
-            _gameModel.PlayerParameter.Health.Subscribe(x =>
-            {
-                _mainRootView.SetHp(_gameModel.PlayerParameter.Health.Value, _gameModel.PlayerParameter.MaxHealth);
-            }).AddTo(_mainRootView);
-            DebugReceiveDamage().Forget();
+            // _gameModel.PlayerParameter.Health.Subscribe(x =>
+            // {
+            //     _mainRootView.SetHp(_gameModel.PlayerParameter.Health.Value, _gameModel.PlayerParameter.MaxHealth);
+            // }).AddTo(_mainRootView);
+            // DebugReceiveDamage().Forget();
         }
 
         private async UniTask DebugReceiveDamage()
@@ -134,6 +145,15 @@ namespace App.Presenters
             foreach (var view in views)
             {
                 await DespawnTsumuAsync(view);
+            }
+
+            if (views[1].TsumuType == TsumuType.Heal)
+            {
+                _healTsumuNumReactiveProperty.Value = ids.Count;
+            }
+            else
+            {
+                _attackTsumuNumReactiveProperty.Value = ids.Count;
             }
         }
 

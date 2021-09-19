@@ -30,6 +30,8 @@ namespace App.Views
         public Guid Guid => _tsumuViewModel.Guid;
         private GameObject _instance;
         
+        
+        
 
         
         public override UniTask OnLoadAsync()
