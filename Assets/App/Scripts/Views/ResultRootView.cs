@@ -6,6 +6,7 @@ using System;
 using App.Presenters;
 using App.Skills;
 using Cysharp.Threading.Tasks;
+using Photon.Pun;
 
 namespace App.Views
 {
@@ -61,6 +62,16 @@ namespace App.Views
                 winEnemy.SetActive(false);
                 loseEnemy.SetActive(true);
             }
+            if (PhotonNetwork.IsMasterClient) 
+            {
+                var myRoom = PhotonNetwork.CurrentRoom;
+                myRoom.IsOpen = false;            // 部屋を閉じる
+                myRoom.IsVisible = false;         // ロビーから見えなくする
+            }
+            
+            PhotonNetwork.LeaveRoom();
+            PhotonNetwork.Disconnect();
+            
             return base.OnLoadAsync();
         }
         public void PlayBGM(bool winOrLose)

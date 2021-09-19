@@ -31,14 +31,22 @@ namespace App.Presenters.Matching
             _matchingStateView.ConnectedToMaster
                 .Subscribe(_ =>
                 {
-                    JoinOrCreateRoom();
+                    // ランダムなルームに参加する
+                    PhotonNetwork.JoinRandomRoom();
                 })
                 .AddTo(_matchingStateView);
             
             _matchingStateView.JoinedRoom
                 .Subscribe(_ =>
                 {
-                    CreateAvatar();
+                    //CreateAvatar();
+                })
+                .AddTo(_matchingStateView);
+            
+            _matchingStateView.JoinedFailedRoom
+                .Subscribe(_ =>
+                {
+                    CreateRoom();
                 })
                 .AddTo(_matchingStateView);
             
@@ -78,15 +86,16 @@ namespace App.Presenters.Matching
         {
             PhotonNetwork.ConnectUsingSettings();
         }
-        
-        /// <summary>
-        /// Roomがあれば入る、なければ作る
-        /// </summary>
-        private void JoinOrCreateRoom() 
+
+        private void CreateRoom()
         {
-            PhotonNetwork.JoinOrCreateRoom("Room", new RoomOptions(), TypedLobby.Default);
+            // ルームの参加人数を2人に設定する
+            var roomOptions = new RoomOptions();
+            roomOptions.MaxPlayers = 2;
+
+            PhotonNetwork.CreateRoom(null, roomOptions);
         }
-        
+
         private  void CreateAvatar() 
         {
            //  PhotonNetwork.Instantiate("Avatar", Vector3.zero, Quaternion.identity);
