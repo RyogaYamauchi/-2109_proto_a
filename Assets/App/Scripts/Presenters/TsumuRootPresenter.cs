@@ -42,11 +42,10 @@ namespace App.Presenters
         public void Initialize()
         {
             _gameModel.TsumuRootModel.Initialize();
-            SetEvents();
             _canSpawnTsumuPoints = new List<Vector2>(_spawnPoint);
         }
 
-        private void SetEvents()
+        public void SetEvents()
         {
             _mainRootView.OnClickSkillAsObservable.Subscribe(x =>
             {

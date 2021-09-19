@@ -21,11 +21,5 @@ namespace App.Views
         {
             var presenter = new TitleRootPresenter(this);
         }
-
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
     }
 }

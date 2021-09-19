@@ -1,4 +1,4 @@
-using System;
+using App.Skills;
 using Photon.Pun;
 using Photon.Realtime;
 using UniRx;
@@ -19,13 +19,7 @@ namespace App.Presenters.Matching
         public MatchingPresenter(MatchingStateView stateView)
         {
             _matchingStateView = stateView;
-            
-            _matchingStateView.InitializeAsyncSubject
-                .Subscribe(_ =>
-                {
-                   Init();
-                })
-                .AddTo(_matchingStateView);
+            Init();
         }
         
         private void Init()
@@ -124,7 +118,7 @@ namespace App.Presenters.Matching
         private  void ChangeSceneToMain()
         {
             Debug.Log("main");
-            ChangeScene<TestMainView>().Forget();
+            ChangeScene<MainRootView>(new MainRootView.Paramater(30, new DeleteLineSkill())).Forget();
         }
 
     }

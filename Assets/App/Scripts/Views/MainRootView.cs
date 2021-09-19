@@ -5,6 +5,7 @@ using App.Skills;
 using Cysharp.Threading.Tasks;
 using UniRx;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace App.Views
@@ -27,6 +28,9 @@ namespace App.Views
         [SerializeField] private Transform _tsumuSpawnRoot;
         [SerializeField] private Transform _tsumuRoot;
 
+        [SerializeField] private TimerView timerView;
+        [SerializeField] private BattleView battleView;
+
         public IObservable<Unit> OnClickSkillAsObservable => _button.OnClickAsObservable().TakeUntilDestroy(this);
         
         // デバッグ機能、シーン単体で起動できる
@@ -38,13 +42,19 @@ namespace App.Views
                 Debug.Log("OnPlayDebug");
                 var presenter = new TsumuRootPresenter(this, new Paramater(30, new OjamaSkill()));
                 presenter.Initialize();
+                
+                var battlePresenter = new BattlePresenter(presenter, timerView, battleView);
+                battlePresenter.Initialize();
             }
         }
 
-        protected override UniTask OnLoadAsync()
+        public override UniTask OnLoadAsync()
         {
             var presenter = new TsumuRootPresenter(this, Parameter);
             presenter.Initialize();
+            
+            var battlePresenter = new BattlePresenter(presenter, timerView, battleView);
+            battlePresenter.Initialize();
             return base.OnLoadAsync();
         }
         

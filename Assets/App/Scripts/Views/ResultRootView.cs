@@ -36,7 +36,7 @@ namespace App.Views
         public GameObject loseEnemy;
         public GameObject winEnemy;
 
-        protected override UniTask OnLoadAsync()
+        public override UniTask OnLoadAsync()
         {
             var param = ((Parameter) GetParameter());
             var presenter = new ResultRootPresenter(this, param.Skill);
