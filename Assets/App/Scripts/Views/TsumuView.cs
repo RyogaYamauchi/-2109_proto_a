@@ -18,6 +18,7 @@ namespace App.Views
         [SerializeField] private Button _button;
         [SerializeField] private GameObject _deleteParticle;
 
+        private readonly int _deleteTime = 250;//ms
         private readonly Subject<TsumuView> _onPointerDownSubject = new Subject<TsumuView>();
         private readonly Subject<TsumuView> _onPointerEnterSubject = new Subject<TsumuView>();
         private readonly Subject<TsumuView> _onPointerUpSubject = new Subject<TsumuView>();
@@ -62,6 +63,12 @@ namespace App.Views
         {
             var pos = transform.position;
             Dispose();
+            PlayParticle(pos).Forget();
+            await UniTask.Delay(_deleteTime);
+        }
+
+        private async UniTask PlayParticle(Vector3 pos)
+        {
             var particle = Instantiate(_deleteParticle);
             particle.transform.position = new Vector3(pos.x, pos.y, pos.z - 10);//UIよりパーティクルを前に表示させる
             await UniTask.Delay(500);
