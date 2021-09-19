@@ -21,13 +21,13 @@ public class TEST : MonoBehaviour
         //await _button.OnClickAsync();
         //asyncとawaitはセット
 
-         _button.OnClickAsObservable().Subscribe(x =>
+         /*_button.OnClickAsObservable().Subscribe(x =>
         {
             count++;
            _text.text= count.ToString();
             //Shift+optionでアンカー
             
-        }).AddTo(this);//thisが破壊したらsubscribe解除
+        }).AddTo(this);//thisが破壊したらsubscribe解除*/
     }
 
     // Update is called once per frame
