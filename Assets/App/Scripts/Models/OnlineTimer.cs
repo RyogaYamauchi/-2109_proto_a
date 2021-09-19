@@ -74,7 +74,7 @@ namespace App.Views
 
                 if (TotalTime <= 0)
                 {
-                    _isTimeUp = true;
+                    IsTimeUp = true;
                     break;
                 }
             }

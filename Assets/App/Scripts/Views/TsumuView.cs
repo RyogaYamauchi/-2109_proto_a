@@ -31,7 +31,7 @@ namespace App.Views
         
 
         
-        protected override UniTask OnLoadAsync()
+        public override UniTask OnLoadAsync()
         {
             _button.OnPointerEnterAsObservable().Subscribe(x => _onPointerEnterSubject.OnNext(this)).AddTo(this);
             _button.OnPointerUpAsObservable().Subscribe(x => _onPointerUpSubject.OnNext(this)).AddTo(this);

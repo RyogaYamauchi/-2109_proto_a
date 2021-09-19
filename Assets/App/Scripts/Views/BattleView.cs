@@ -9,7 +9,7 @@ namespace App.Views
     {
         private Subject<float> _onDamagedSubject = new Subject<float>();
         public IObservable<float> OnDamagedAsObservable => _onDamagedSubject.TakeUntilDestroy(this);
-        
+
 
         public void SendDamage(float damage)
         {
@@ -21,6 +21,7 @@ namespace App.Views
         {
             _onDamagedSubject.OnNext(damage);
         }
+        
         
     }
 }
