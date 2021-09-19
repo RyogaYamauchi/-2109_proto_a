@@ -158,6 +158,7 @@ MonoBehaviour:
   _button: {fileID: 509664168}
   _tsumuSpawnRoot: {fileID: 2144601481}
   _tsumuRoot: {fileID: 1454059900}
+  _hpSlider: {fileID: 1160025206}
 --- !u!114 &46515925
 MonoBehaviour:
   m_ObjectHideFlags: 0

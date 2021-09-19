@@ -15,20 +15,23 @@ namespace App.Views
         public class Paramater : IParameter
         {
             public int MaxTsumuCount;
-            public ISkill Skill; 
+            public ISkill Skill;
+            public int MaxHp;
 
-            public Paramater(int maxTsumuCount, ISkill skill)
+            public Paramater(int maxTsumuCount, ISkill skill, int maxHp)
             {
                 MaxTsumuCount = maxTsumuCount;
                 Skill = skill;
+                MaxHp = maxHp;
             }
         }
         [SerializeField] private Button _button;
         [SerializeField] private Transform _tsumuSpawnRoot;
         [SerializeField] private Transform _tsumuRoot;
+        [SerializeField] private Slider _hpSlider;
 
         public IObservable<Unit> OnClickSkillAsObservable => _button.OnClickAsObservable().TakeUntilDestroy(this);
-        
+
         // デバッグ機能、シーン単体で起動できる
         private void Start()
         {
@@ -36,7 +39,7 @@ namespace App.Views
             {
                 // デバッグではDeleteLineSkillを使用
                 Debug.Log("OnPlayDebug");
-                var presenter = new TsumuRootPresenter(this, new Paramater(30, new DeleteLineSkill()));
+                var presenter = new TsumuRootPresenter(this, new Paramater(30, new DeleteLineSkill(), 300));
                 presenter.Initialize();
             }
         }
@@ -56,6 +59,13 @@ namespace App.Views
         public Vector2 GetSpawnRootPosition()
         {
             return _tsumuSpawnRoot.position;
+        }
+
+        public void SetHp(float value, float maxValue)
+        {
+            _hpSlider.minValue = 0;
+            _hpSlider.maxValue = maxValue;
+            _hpSlider.value = value;
         }
     }
 }

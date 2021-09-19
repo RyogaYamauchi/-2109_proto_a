@@ -1,12 +1,10 @@
-using System.Collections;
 using Photon.Pun;
 using UnityEngine;
 using System.Threading;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 
 
-namespace App.Views
+namespace App.Models
 {
     public class OnlineTimer
     {

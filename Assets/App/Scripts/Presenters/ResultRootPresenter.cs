@@ -13,7 +13,7 @@ namespace App.Presenters
             //view.OnClickTitle.Subscribe(x => ChangeScene<Title>);
             rootView.OnClickRetry.Subscribe(x =>
             {
-                ChangeScene<MainRootView>(new MainRootView.Paramater(30, skill)).Forget();
+                ChangeScene<MainRootView>(new MainRootView.Paramater(30, skill, 100)).Forget();
             });
         }
     }

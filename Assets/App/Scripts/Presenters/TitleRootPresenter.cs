@@ -15,7 +15,7 @@ namespace App.Presenters
         {
             rootView.OnClickOnline.Subscribe(x =>
             {
-                ChangeScene<MainRootView>(new MainRootView.Paramater(30, new DeleteLineSkill())).Forget();
+                ChangeScene<MainRootView>(new MainRootView.Paramater(30, new DeleteLineSkill(), 100)).Forget();
             });
         }
     }
