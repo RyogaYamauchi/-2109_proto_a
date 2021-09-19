@@ -143,15 +143,22 @@ namespace App.Presenters
         {
             _closingViewList.Add(tsumuView);
             _tsumuViewList.Remove(tsumuView);
+           
+            var pos = tsumuView.transform.position;
+            PlayDamageView(pos, tsumuView).Forget();
+            await tsumuView.CloseAsync();
+            _closingViewList.Remove(tsumuView);
+        }
+
+        private async UniTask PlayDamageView(Vector3 pos, TsumuView tsumuView)
+        {
             var damageView = await CreateViewAsync<TsumuAttackNumView>();
             _mainRootView.SetParentTakeDamageNum(damageView);
-            var pos = tsumuView.transform.position;
             damageView.transform.position = pos;
             var damage = _tsumuRootModel.GetDamage(tsumuView.TsumuType);
             damageView.Initialize(damage);
-            damageView.MoveToTarget(_mainRootView.GetEnemyPosition()).Forget();
-            await tsumuView.CloseAsync();
-            _closingViewList.Remove(tsumuView);
+            await damageView.MoveToTarget(_mainRootView.GetEnemyPosition());
+            damageView.Dispose();
         }
 
         private void OnPointerEntertsumu(TsumuView view)
