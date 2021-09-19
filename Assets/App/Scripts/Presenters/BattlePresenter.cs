@@ -15,6 +15,7 @@ namespace App.Presenters
         private BattleView _battleView;
         private TimerView _timerView;
         private readonly OnlineTimer _timer;
+        private bool _isWin;
 
         public BattlePresenter(TsumuRootPresenter tsumuRootPresenter, TimerView timerView, BattleView battleView)
         {
@@ -26,6 +27,7 @@ namespace App.Presenters
             
             _timerView = timerView;
             _battleView = battleView;
+            _isWin = false;
         }
         
         public BattlePresenter(TimerView view)
@@ -57,24 +59,13 @@ namespace App.Presenters
                 .AddTo(_timerView);
             
             _timer.ObserveEveryValueChanged(x => x.TotalTime)
+                .Skip(1)
                 .Subscribe(_timerView.ChangeTimer)
                 .AddTo(_timerView);
             
             _timer.ObserveEveryValueChanged(x => x.IsStart)
                 .Where(x => x)
                 .Subscribe( _ => _tsumuRootPresenter.SetEvents())
-                .AddTo(_timerView);
-            
-            _timer.ObserveEveryValueChanged(x => x.IsTimeUp)
-                .Where(x => x)
-                .Subscribe(_ =>
-                {
-                    if (!PhotonNetwork.IsMasterClient)
-                    {
-                        return;
-                    }
-                    ChangeSceneState(SceneState.SceneStateType.Result);
-                })
                 .AddTo(_timerView);
 
             // resultに遷移
@@ -84,19 +75,105 @@ namespace App.Presenters
 
 
             // ダメージ受ける処理
-            // _battleView.OnDamagedAsObservable
-            //     .Subscribe(ReceiveDamage).AddTo(_battleView);
+            _battleView.OnDamagedAsObservable
+                .Subscribe(ReceiveDamage).AddTo(_battleView);
 
-            // TODO:ツム消した時の処理
+            
             // ツム消した通知を受け取る
-            // ツムのタイプによって攻撃か回復
-            // ダメージを計算
+            // 攻撃
+            _tsumuRootPresenter.AttackTsumuNumObservable
+                .Skip(1)
+                .Subscribe(num =>
+                {
+                    var damage = CalculateDamage(num);
+                    _battleView.SendDamage(damage);
+                })
+                .AddTo(_battleView);
 
-            // 回復した値送る
+            // 回復
+            _tsumuRootPresenter.HealTsumuNumObservable
+                .Skip(1)
+                .Subscribe(num =>
+                {
+                    var addHealth = CalculateHeal(num);
+                    GameModel.Instance.PlayerParameter.Recover(addHealth);
+                })
+                .AddTo(_battleView);
+            
+            // 体力が変わったことを相手に通知
+            GameModel.Instance.PlayerParameter.Health
+                .Subscribe(health =>
+                {
+                    _battleView.SendHealthChange(health);
 
+                    if (health <= 0)
+                    {
+                        _battleView.SendHealthForWinOrLose(health);
+                        // 負けResultに飛びたい
+                        _isWin = false;
+                        _battleView.SendWinOrLoseFlag(!_isWin);
+                    }
+                })
+                .AddTo(_battleView);
+            
+            // 敵の体力が変わった通知を受けとる
+            _battleView.OnHealthChangeAsObservable
+                .Subscribe(health =>
+                {
+                    _battleView.SetEnemyHp(health , GameModel.Instance.PlayerParameter.MaxHealth);
+                })
+                .AddTo(_battleView);
+            
+            // TimeUpになったらシーンステートを変更
+            _timer.ObserveEveryValueChanged(x => x.IsTimeUp)
+                .Where(x => x)
+                .Subscribe(_ =>
+                {
+                    if (!PhotonNetwork.IsMasterClient)
+                    {
+                        _battleView.SendHealthForWinOrLose(GameModel.Instance.PlayerParameter.Health.Value);
+                    }
+                })
+                .AddTo(_timerView);
 
-            // ダメージ相手に送る
-            // _battleView.SendDamage(CalculateDamage(1));
+            // マスターしか受け取らない
+            _battleView.OnHealthForWinOrLoseAsObservable
+                .Subscribe(enemyHealth =>
+                {
+                    _isWin = Judge(enemyHealth);
+                    // 勝敗結果を送る
+                    _battleView.SendWinOrLoseFlag(!_isWin);
+                });
+
+            // 勝敗判定を受け取る
+            _battleView.OnWinOrLoseFlagAsObservable
+                .Subscribe(isWin =>
+                {
+                    _isWin = isWin;
+                    _battleView.SendArriveWinOrLoseFlag();
+                })
+                .AddTo(_battleView);
+            
+            // 勝敗判定を相手が受け取ったかの通知を購読
+            _battleView.ArriveWinOrLoseFlag
+                .Subscribe(_ =>
+                {
+                    if (PhotonNetwork.IsMasterClient)
+                    {
+                        ChangeSceneState(SceneState.SceneStateType.Result);
+                    }
+                })
+                .AddTo(_battleView);
+        }
+
+        private bool Judge(float enemyHealth)
+        {
+            if (enemyHealth <= 0)
+            {
+                return true;
+            }
+            
+            return GameModel.Instance.PlayerParameter.Health.Value > enemyHealth;
         }
         
 
@@ -122,6 +199,22 @@ namespace App.Presenters
             // damage *= _playerParameter.Combo;
 
             return damage;
+        }
+        
+        
+        /// <summary>
+        /// 消したツムの数で回復量を計算
+        /// </summary>
+        /// <param name="tsumuNum"></param>
+        /// <returns></returns>
+        private float CalculateHeal(int tsumuNum)
+        {
+            var addHealth = tsumuNum;
+
+            // コンボ倍率
+            // damage *= _playerParameter.Combo;
+
+            return addHealth;
         }
         
         /// <summary>
@@ -150,7 +243,7 @@ namespace App.Presenters
         /// </summary>
         private void ChangeSceneToResult()
         {
-            ChangeScene<ResultRootView>().Forget();
+            ChangeScene<ResultRootView>(new ResultRootView.Parameter(_isWin, null)).Forget();
         }
     }
 }
