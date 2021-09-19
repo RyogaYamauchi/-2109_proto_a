@@ -160,13 +160,13 @@ namespace App.Presenters
                 }
             }
 
-            if (views[1].TsumuType == TsumuType.Heal)
+            if (views.Any(x => x.TsumuType == TsumuType.Heal))
             {
-                _healTsumuNumReactiveProperty.Value = ids.Count;
+                _healTsumuNumReactiveProperty.Value = chain;
             }
             else
             {
-                _attackTsumuNumReactiveProperty.Value = ids.Count;
+                _attackTsumuNumReactiveProperty.Value = chain;
             }
         }
 
@@ -240,6 +240,11 @@ namespace App.Presenters
             }
             
             var lastView = _tsumuViewList.FirstOrDefault(x => x.Guid == lastGuid);
+            if (lastView == null)
+            {
+                return false;
+            }
+            
             var difference = lastView.GetLocalPosition() - view.GetLocalPosition();
             var modelState = _tsumuRootModel.CanSelect(view.Guid);
 
