@@ -2,7 +2,7 @@
 using App.MasterData;
 using App.Types;
 
-namespace App.ViewModels
+namespace App.Models
 {
     public sealed class TsumuModel
     {
