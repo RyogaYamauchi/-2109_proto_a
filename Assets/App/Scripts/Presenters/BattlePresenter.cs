@@ -106,17 +106,7 @@ namespace App.Presenters
         /// <param name="damage"></param>
         private void ReceiveDamage(float damage)
         {
-            var health = _playerParameter.Health;
-            var newHealth = health - damage;
-
-            if (newHealth <= 0)
-            {
-                newHealth = 0;
-                
-                // 体力が０になったときに通知
-            }
-
-            _playerParameter.Health = newHealth;
+            GameModel.Instance.PlayerParameter.RecieveDamage(damage);
         }
 
         /// <summary>

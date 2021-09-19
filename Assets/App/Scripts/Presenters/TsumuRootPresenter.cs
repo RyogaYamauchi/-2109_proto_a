@@ -33,7 +33,6 @@ namespace App.Presenters
         public TsumuRootPresenter(MainRootView view, IParameter parameter)
         {
             var param = (MainRootView.Paramater) parameter;
-            _skill = param.Skill;
             _maxTsumuCount = param.MaxTsumuCount;
             Debug.Log(_maxTsumuCount);
             _mainRootView = view;
@@ -42,7 +41,22 @@ namespace App.Presenters
         public void Initialize()
         {
             _gameModel.TsumuRootModel.Initialize();
+            _skill = _gameModel.SkillModel.GetRandomSkill();
             _canSpawnTsumuPoints = new List<Vector2>(_spawnPoint);
+            _gameModel.PlayerParameter.Health.Subscribe(x =>
+            {
+                _mainRootView.SetHp(_gameModel.PlayerParameter.Health.Value, _gameModel.PlayerParameter.MaxHealth);
+            }).AddTo(_mainRootView);
+            DebugReceiveDamage().Forget();
+        }
+
+        private async UniTask DebugReceiveDamage()
+        {
+            for (var i = 0; i < 20; i++)
+            {
+                await UniTask.Delay(500); 
+                _gameModel.PlayerParameter.RecieveDamage(5);
+            }
         }
 
         public void SetEvents()

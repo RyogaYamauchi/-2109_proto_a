@@ -4,10 +4,14 @@
     {
         public static GameModel Instance { get; } = new GameModel();
         public TsumuRootModel TsumuRootModel { get; }
+        public PlayerParameter PlayerParameter { get; }
+        public SkillModel SkillModel { get; }
 
         public GameModel()
         {
             TsumuRootModel = new TsumuRootModel();
+            PlayerParameter = new PlayerParameter();
+            SkillModel = new SkillModel();
         }
     }
 }

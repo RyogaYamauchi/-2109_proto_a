@@ -4,9 +4,11 @@ using Photon.Realtime;
 using UniRx;
 using UnityEngine;
 using App.Lib;
+using App.Models;
 using App.View.Matching;
 using App.Views;
 using Cysharp.Threading.Tasks;
+using ExitGames.Client.Photon.StructWrapping;
 
 namespace App.Presenters.Matching
 {
@@ -118,7 +120,7 @@ namespace App.Presenters.Matching
         private  void ChangeSceneToMain()
         {
             Debug.Log("main");
-            ChangeScene<MainRootView>(new MainRootView.Paramater(30, new DeleteLineSkill())).Forget();
+            ChangeScene<MainRootView>(new MainRootView.Paramater(30, 300)).Forget();
         }
 
     }

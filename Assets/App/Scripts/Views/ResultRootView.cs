@@ -39,7 +39,7 @@ namespace App.Views
         public override UniTask OnLoadAsync()
         {
             var param = ((Parameter) GetParameter());
-            var presenter = new ResultRootPresenter(this, param.Skill);
+            var presenter = new ResultRootPresenter(this);
             var winOrLose = param.IsWinOrLose;
             Debug.Log(winOrLose);
             //_rateltText.text = "1300";

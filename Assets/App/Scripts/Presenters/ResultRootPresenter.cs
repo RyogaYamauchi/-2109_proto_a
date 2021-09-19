@@ -8,12 +8,12 @@ namespace App.Presenters
 {
     public class ResultRootPresenter : RootPresenterBase
     {
-        public ResultRootPresenter(ResultRootView rootView, ISkill skill)
+        public ResultRootPresenter(ResultRootView rootView)
         {
             //view.OnClickTitle.Subscribe(x => ChangeScene<Title>);
             rootView.OnClickRetry.Subscribe(x =>
             {
-                ChangeScene<MainRootView>(new MainRootView.Paramater(30, skill)).Forget();
+                ChangeScene<MainRootView>(new MainRootView.Paramater(30, 100)).Forget();
             });
         }
     }
