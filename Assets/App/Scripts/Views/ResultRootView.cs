@@ -93,20 +93,9 @@ namespace App.Views
         private void SetRate(bool isWin)
         {
             var range = 50;
-            var rate = 0;
-            if (PlayerPrefs.HasKey("rate"))
-            {
-                rate = PlayerPrefs.GetInt("rate");
-                rate += isWin ? range : -range;
-                
-            }
-            else
-            {
-                rate = 1000;
-            }
-            
+            var rate = PlayerPrefs.HasKey("rate") ? PlayerPrefs.GetInt("rate") : 1000;
+            rate += isWin ? range : -range;
             PlayerPrefs.SetInt("rate", rate);
-
             var plusOrMinul = isWin ? "+" : "-";
             _rateltText.text = $"rate : {rate}\n{plusOrMinul}{range}...";
         }
