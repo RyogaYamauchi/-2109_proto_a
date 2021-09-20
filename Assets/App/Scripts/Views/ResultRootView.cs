@@ -68,6 +68,8 @@ namespace App.Views
                 myRoom.IsOpen = false;            // 部屋を閉じる
                 myRoom.IsVisible = false;         // ロビーから見えなくする
             }
+
+            SetRate(winOrLose);
             
             PhotonNetwork.LeaveRoom();
             PhotonNetwork.Disconnect();
@@ -86,6 +88,27 @@ namespace App.Views
                 audioSource.PlayOneShot(LoseSound);
             }
 
+        }
+
+        private void SetRate(bool isWin)
+        {
+            var range = 50;
+            var rate = 0;
+            if (PlayerPrefs.HasKey("rate"))
+            {
+                rate = PlayerPrefs.GetInt("rate");
+                rate += isWin ? range : -range;
+                
+            }
+            else
+            {
+                rate = 1000;
+            }
+            
+            PlayerPrefs.SetInt("rate", rate);
+
+            var plusOrMinul = isWin ? "+" : "-";
+            _rateltText.text = $"rate : {rate}\n{plusOrMinul}{range}...";
         }
         
     }
