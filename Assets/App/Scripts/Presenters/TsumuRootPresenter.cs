@@ -274,8 +274,13 @@ namespace App.Presenters
         {
             foreach (var view in targetTsumuList)
             {
-                await DespawnTsumuAsync(view);
+                DespawnTsumuAsync(view).Forget();
             }
+        }
+
+        public IReadOnlyList<TsumuView> GetClosingTsumuList()
+        {
+            return _closingViewList.AsReadOnly();
         }
     }
 }

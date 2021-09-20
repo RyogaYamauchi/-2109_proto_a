@@ -77,5 +77,10 @@ namespace App.Views
         {
             return transform.localPosition;
         }
+
+        public void SetInteractive(bool state)
+        {
+            _button.interactable = state;
+        }
     }
 }
