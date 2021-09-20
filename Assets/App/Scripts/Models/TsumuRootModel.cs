@@ -16,12 +16,12 @@ namespace App.Models
         private List<TsumuData> _tsumuDataList = new List<TsumuData>();
 
         private List<TsumuData> _cacheTsumuData = new List<TsumuData>();
-        
+
         private List<TsumuData> LoadTsumuData()
         {
             if (_cacheTsumuData.Count == 0)
             {
-                _cacheTsumuData =  Resources.LoadAll<TsumuData>("MasterData/")
+                _cacheTsumuData = Resources.LoadAll<TsumuData>("MasterData/")
                     .Where(x => x.TsumuType != TsumuType.Ojama).ToList();
             }
 
@@ -32,12 +32,13 @@ namespace App.Models
         {
             return _tsumuList.FirstOrDefault(x => x.Guid == guid);
         }
+
         public void Initialize()
         {
             _tsumuDataList = LoadTsumuData();
         }
-        
-     
+
+
         public TsumuViewModel SpawnTsumu()
         {
             var guid = Guid.NewGuid();
@@ -55,7 +56,7 @@ namespace App.Models
 
         public void UnSelectTsumuAll()
         {
-             _selectingTsumuIdList.Clear();
+            _selectingTsumuIdList.Clear();
         }
 
         public List<Guid> GetSelectingTsumuIdList()
@@ -73,7 +74,7 @@ namespace App.Models
             {
                 return false;
             }
-            
+
             if (lastModel.TsumuData.TsumuType != targetModel.TsumuData.TsumuType)
             {
                 return false;
@@ -108,6 +109,11 @@ namespace App.Models
         public int GetDamage(TsumuType tsumuType)
         {
             return LoadTsumuData().FirstOrDefault(x => x.TsumuType == tsumuType).AttackPoint;
+        }
+
+        public int CalcDamage(int chain, int attackPoint)
+        {
+            return (int) (attackPoint + (chain * 0.5f));
         }
     }
 }
