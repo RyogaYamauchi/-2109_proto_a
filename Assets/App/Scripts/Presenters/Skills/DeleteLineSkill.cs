@@ -26,15 +26,14 @@ namespace App.Skills
                 }).ToList();
             foreach (var target in targetList)
             {
-                GameModel.Instance.TsumuRootModel.SelectTsumu(target.Guid);
+                //GameModel.Instance.TsumuRootModel.SelectTsumu(target.Guid);
                 target.SetInteractive(false);
             }
 
             await tsumuRootPresenter.DespawnTsumuListAsync(targetList);
-            GameModel.Instance.TsumuRootModel.UnSelectTsumuAll();
+            //GameModel.Instance.TsumuRootModel.UnSelectTsumuAll();
             foreach (var target in targetList)
             {
-                GameModel.Instance.TsumuRootModel.SelectTsumu(target.Guid);
                 target.SetInteractive(true);
             }
         }

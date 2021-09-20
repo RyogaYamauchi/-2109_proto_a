@@ -177,13 +177,14 @@ namespace App.Presenters
 
         private async UniTask DespawnTsumuAsync(TsumuView tsumuView)
         {
-            _closingViewList.Add(tsumuView);
             _tsumuViewList.Remove(tsumuView);
-           
+            if (tsumuView == null)
+            {
+                return;
+            }
             var pos = tsumuView.transform.position;
             PlayDamageView(pos, tsumuView).Forget();
             await tsumuView.CloseAsync();
-            _closingViewList.Remove(tsumuView);
         }
 
         private async UniTask PlayDamageView(Vector3 pos, TsumuView tsumuView)
@@ -207,17 +208,42 @@ namespace App.Presenters
             SelectTsumu(view);
         }
 
-        private UniTask OnPointerUpTsumu(TsumuView view)
+        private async UniTask OnPointerUpTsumu(TsumuView view)
         {
-            if (_tsumuRootModel.GetSelectingTsumuCount() < 3)
+            if (_tsumuRootModel.GetSelectingTsumuCount()< 3 || _closingViewList.Contains(view))
             {
                 UnSelectTsumuAll();
-                return UniTask.CompletedTask;
+                return;
             }
+            
+            var ids = _tsumuRootModel.GetSelectingTsumuIdList();
+            var chain = ids.Count;
+            var views = _tsumuViewList.Where(x => ids.Contains(x.Guid)).ToArray();
 
-            DespawnSelectingTsumusAsync().Forget();
+            var deleteTsumuList = _gameModel.TsumuRootModel.GetSelectingTsumuIdList()
+                .Select(id => _tsumuViewList.FirstOrDefault(x =>id == x.Guid)).ToArray();
             _gameModel.TsumuRootModel.UnSelectTsumuAll();
-            return UniTask.CompletedTask;
+            _closingViewList.AddRange(deleteTsumuList);
+            foreach (var tsumu in deleteTsumuList)
+            {
+                _gameModel.SkillModel.AddSkillPoint(1);
+
+                await DespawnTsumuAsync(tsumu);
+                if (_gameModel.SkillModel.CanExecuteSkill(_skill))
+                {
+                    _mainRootView.SetActiveSkillButton(true);
+                }
+                _closingViewList.Remove(tsumu);
+            }
+            
+            if (views.Any(x => x.TsumuType == TsumuType.Heal))
+            {
+                _healTsumuNumReactiveProperty.Value = chain;
+            }
+            else
+            {
+                _attackTsumuNumReactiveProperty.Value = chain;
+            }
         }
 
         private void OnPointerDownTsumu(TsumuView view)
@@ -271,7 +297,7 @@ namespace App.Presenters
             return _tsumuViewList.AsReadOnly();
         }
 
-        public async Task DespawnTsumuListAsync(List<TsumuView> targetTsumuList)
+        public async UniTask DespawnTsumuListAsync(List<TsumuView> targetTsumuList)
         {
             foreach (var view in targetTsumuList)
             {
