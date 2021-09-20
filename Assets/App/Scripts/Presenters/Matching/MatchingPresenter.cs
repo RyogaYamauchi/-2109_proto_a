@@ -60,6 +60,7 @@ namespace App.Presenters.Matching
 
                     if (PhotonNetwork.PlayerList.Length == 2)
                     {
+                        PhotonNetwork.CurrentRoom.IsOpen = false;
                         ChangeSceneState(SceneState.SceneStateType.Main);
                     }
                     
