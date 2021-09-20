@@ -33,8 +33,8 @@ namespace App.Presenters
         private ISkill _skill;
         
         // 攻撃ツム消した数
-        private readonly ReactiveProperty<int> _attackTsumuNumReactiveProperty = new ReactiveProperty<int>(0);
-        public IObservable<int> AttackTsumuNumObservable => _attackTsumuNumReactiveProperty;
+        private readonly ReactiveProperty<int> _attackDamageReactiveProperty = new ReactiveProperty<int>(0);
+        public IObservable<int> AttackDamageObservable => _attackDamageReactiveProperty;
         
         // 回復ツム消した数
         private readonly ReactiveProperty<int> _healTsumuNumReactiveProperty = new ReactiveProperty<int>(0);
@@ -53,6 +53,7 @@ namespace App.Presenters
         public void Initialize()
         {
             _gameModel.TsumuRootModel.Initialize();
+            _gameModel.PlayerParameter.Clear();
             _skill = _gameModel.SkillModel.GetRandomSkill();
             _gameModel.SkillModel.Initialize(_skill.GetNeedValue());
             _canSpawnTsumuPoints = new List<Vector2>(_spawnPoint);
@@ -170,7 +171,7 @@ namespace App.Presenters
             }
             else
             {
-                _attackTsumuNumReactiveProperty.Value = chain;
+                _attackDamageReactiveProperty.Value = chain * _tsumuRootModel.GetDamage(views[1].TsumuType);
             }
         }
 
