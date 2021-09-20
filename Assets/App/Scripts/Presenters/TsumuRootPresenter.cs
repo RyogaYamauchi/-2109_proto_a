@@ -195,7 +195,10 @@ namespace App.Presenters
             var damage = _tsumuRootModel.GetDamage(tsumuView.TsumuType);
             damageView.Initialize(damage);
             await damageView.MoveToTarget(_mainRootView.GetEnemyPosition());
-            damageView.Dispose();
+            if (damageView != null)
+            {
+                damageView.Dispose();
+            }
         }
 
         private void OnPointerEntertsumu(TsumuView view)
@@ -242,7 +245,7 @@ namespace App.Presenters
             }
             else
             {
-                _attackTsumuNumReactiveProperty.Value = chain;
+                _attackDamageReactiveProperty.Value = chain;
             }
         }
 
