@@ -5,6 +5,7 @@ using App.Views;
 using Cysharp.Threading.Tasks;
 using Photon.Pun;
 using UniRx;
+using UnityEngine.UI;
 
 namespace App.Presenters
 {
@@ -103,14 +104,20 @@ namespace App.Presenters
             GameModel.Instance.PlayerParameter.Health
                 .Subscribe(health =>
                 {
+                    Debug.Log(health);
                     _battleView.SendHealthChange(health);
-
                     if (health <= 0)
                     {
                         _battleView.SendHealthForWinOrLose(health);
                         // 負けResultに飛びたい
                         _isWin = false;
                         _battleView.SendWinOrLoseFlag(!_isWin);
+                    }else if(health <= 20)
+                    {
+                        _battleView.LowHpFlush();
+                    }else if(health > 20)
+                    {
+                        _battleView.LowHpStop();
                     }
                 })
                 .AddTo(_battleView);
