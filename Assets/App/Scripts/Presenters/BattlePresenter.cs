@@ -81,11 +81,10 @@ namespace App.Presenters
             
             // ツム消した通知を受け取る
             // 攻撃
-            _tsumuRootPresenter.AttackTsumuNumObservable
+            _tsumuRootPresenter.AttackDamageObservable
                 .Skip(1)
-                .Subscribe(num =>
+                .Subscribe(damage =>
                 {
-                    var damage = CalculateDamage(num);
                     _battleView.SendDamage(damage);
                 })
                 .AddTo(_battleView);

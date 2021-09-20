@@ -18,7 +18,7 @@ namespace App.Presenters
 
             rootView.OnClickTitle.Subscribe(x =>
             {
-                ChangeScene<MainRootView>(new MainRootView.Paramater(30, 100, true)).Forget();
+                ChangeScene<TitleRootView>().Forget();
             });
         }
     }
