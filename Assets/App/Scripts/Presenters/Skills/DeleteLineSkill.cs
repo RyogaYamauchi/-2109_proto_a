@@ -24,13 +24,19 @@ namespace App.Skills
                     var pos = tsumuView.GetLocalPosition();
                     return pos.y < YRange && pos.y - 50 > -YRange;
                 }).ToList();
+            int c = 0;
             foreach (var target in targetList)
             {
-                //GameModel.Instance.TsumuRootModel.SelectTsumu(target.Guid);
                 target.SetInteractive(false);
+                c++;
             }
 
-            await tsumuRootPresenter.DespawnTsumuListAsync(targetList);
+            var a = targetList.Select((view, cnt) =>
+            {
+                return (view, GameModel.Instance.TsumuRootModel.CalcDamage(cnt, (GameModel.Instance.TsumuRootModel.GetDamage(view.TsumuType))));
+            });
+
+            await tsumuRootPresenter.DespawnTsumuListAsync(a.ToList());
             //GameModel.Instance.TsumuRootModel.UnSelectTsumuAll();
             foreach (var target in targetList)
             {
