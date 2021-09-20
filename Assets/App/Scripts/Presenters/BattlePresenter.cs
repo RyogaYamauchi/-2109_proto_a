@@ -163,6 +163,15 @@ namespace App.Presenters
                     }
                 })
                 .AddTo(_battleView);
+            
+            // プレイヤーが抜けた
+            _battleView.LeftPlayerFlag
+                .Subscribe(_ =>
+                {
+                    _isWin = true;
+                    ChangeSceneState(SceneState.SceneStateType.Result);
+                })
+                .AddTo(_battleView);
         }
 
         private bool Judge(float enemyHealth)
