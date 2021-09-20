@@ -24,7 +24,7 @@ namespace App.Presenters
 
             // scriptableObjectかPrefabとかで設定したい
             _playerParameter = new PlayerParameter(100);
-            _timer = new OnlineTimer(5, 60);
+            _timer = new OnlineTimer(5, 120);
             
             _timerView = timerView;
             _battleView = battleView;
@@ -34,7 +34,7 @@ namespace App.Presenters
         public BattlePresenter(TimerView view)
         {
             _playerParameter = new PlayerParameter(100);
-            _timer = new OnlineTimer(5, 60);
+            _timer = new OnlineTimer(5, 120);
             
             _timerView = view;
         }
