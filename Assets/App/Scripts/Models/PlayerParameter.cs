@@ -4,7 +4,7 @@ namespace App.Models
 {
     public class PlayerParameter
     {
-        private readonly float _defaultHealth = 100;
+        private readonly float _defaultHealth = 20;
         private readonly float _defaultMaxHealth = 100;
 
         private ReactiveProperty<float> _health = new ReactiveProperty<float>();

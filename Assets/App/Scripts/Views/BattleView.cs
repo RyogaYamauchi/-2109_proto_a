@@ -11,8 +11,11 @@ namespace App.Views
     {
         [SerializeField] private Slider playerHpSlider;
         [SerializeField] private Slider enemyHpSlider;
-        
-        
+        [SerializeField] private Image lowHpImage;
+        private Color lowHpColor = Color.clear;
+        private float lowHpTime;
+
+
         private readonly Subject<float> _onDamagedSubject = new Subject<float>();
         public IObservable<float> OnDamagedAsObservable => _onDamagedSubject.TakeUntilDestroy(this);
         
@@ -105,8 +108,29 @@ namespace App.Views
         {
             _arriveWinOrLoseFlag.OnNext(Unit.Default);
         }
-        
-        
+
+        public void LowHpFlush()
+        {
+            //画面を赤塗り
+            lowHpColor = new Color(0.5f, 0f, 0f, 0.5f);
+        }
+
+        public void Update()
+        {
+            //時間経過ごとに透明化
+            lowHpTime += Time.deltaTime;
+            if (lowHpTime >= 1.0f)
+            {
+                lowHpTime = 0f;
+            }
+            lowHpImage.color = Color.Lerp(lowHpColor, Color.clear, lowHpTime);
+        }
+
+        public void LowHpStop()
+        {
+            lowHpColor = Color.clear;
+        }
+
     }
 }
 
