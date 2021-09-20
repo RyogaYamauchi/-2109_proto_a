@@ -1,6 +1,7 @@
 using System;
 using App.Models;
 using Photon.Pun;
+using Photon.Realtime;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
@@ -27,6 +28,9 @@ namespace App.Views
         
         private readonly Subject<Unit> _arriveWinOrLoseFlag = new Subject<Unit>();
         public IObservable<Unit> ArriveWinOrLoseFlag => _arriveWinOrLoseFlag;
+        
+        private readonly Subject<Unit> _leftPlayerFlag = new Subject<Unit>();
+        public IObservable<Unit> LeftPlayerFlag => _leftPlayerFlag;
 
 
         public void SendDamage(float damage)
@@ -104,6 +108,13 @@ namespace App.Views
         private void RPCArriveWinOrLoseFlag() 
         {
             _arriveWinOrLoseFlag.OnNext(Unit.Default);
+        }
+        
+        
+        // プレイヤーが抜けた
+        public override void OnPlayerLeftRoom(Player otherPlayer) 
+        {
+            _leftPlayerFlag.OnNext(Unit.Default);
         }
         
         
