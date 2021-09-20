@@ -286,6 +286,11 @@ namespace App.Presenters
             }
         }
 
+        public void TakeDamage(int damage)
+        {
+            _attackDamageReactiveProperty.Value = damage;
+        }
+
         public IReadOnlyList<TsumuView> GetClosingTsumuList()
         {
             return _closingViewList.AsReadOnly();

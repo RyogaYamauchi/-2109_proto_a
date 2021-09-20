@@ -37,6 +37,7 @@ namespace App.Skills
             });
 
             await tsumuRootPresenter.DespawnTsumuListAsync(a.ToList());
+            tsumuRootPresenter.TakeDamage(a.Sum(x => x.Item2));
             //GameModel.Instance.TsumuRootModel.UnSelectTsumuAll();
             foreach (var target in targetList)
             {
