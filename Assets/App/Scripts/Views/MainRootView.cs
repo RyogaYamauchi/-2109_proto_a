@@ -36,6 +36,10 @@ namespace App.Views
         [SerializeField] private Slider _skillSlider;
         [SerializeField] private Button _goTitleButton;
 
+        [SerializeField] private Image skillMaxImage;
+        private Color skillMaxColor = Color.clear;
+        private float skillMaxTime;
+
         public IObservable<Unit> OnClickSkillAsObservable => _button.OnClickAsObservable().TakeUntilDestroy(this);
 
         public IObservable<Unit> OnClickGoTitleButtonAsObservable =>
@@ -113,6 +117,36 @@ namespace App.Views
         public void SetActiveSkillButton(bool state)
         {
             _button.interactable = state;
+            if (state)
+            {
+                SkillMaxFlush();
+            }
+            else
+            {
+                SkillMaxStop();
+            }
+        }
+
+        public void SkillMaxFlush()
+        {
+            //画面を赤塗り
+            skillMaxColor = new Color(1f, 1f, 1f, 1f);
+        }
+
+        public void Update()
+        {
+            //時間経過ごとに透明化
+            skillMaxTime += Time.deltaTime;
+            if (skillMaxTime >= 1.0f)
+            {
+                skillMaxTime = 0f;
+            }
+            skillMaxImage.color = Color.Lerp(skillMaxColor, Color.clear, skillMaxTime);
+        }
+
+        public void SkillMaxStop()
+        {
+            skillMaxColor = Color.clear;
         }
     }
 }
