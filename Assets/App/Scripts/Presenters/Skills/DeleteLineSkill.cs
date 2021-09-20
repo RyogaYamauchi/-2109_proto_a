@@ -9,7 +9,7 @@ namespace App.Skills
     {
         //画面の真ん中１列のツムを削除する、
         private readonly int YRange = 100;
-        private readonly int NeedValue = 5;
+        private readonly int NeedValue = 30;
 
         public async UniTask ExecuteAsync(TsumuRootPresenter tsumuRootPresenter)
         {
@@ -22,7 +22,7 @@ namespace App.Skills
                 .Where(tsumuView =>
                 {
                     var pos = tsumuView.GetLocalPosition();
-                    return pos.y < YRange && pos.y > -YRange;
+                    return pos.y < YRange && pos.y - 50 > -YRange;
                 }).ToList();
             foreach (var target in targetList)
             {

@@ -18,7 +18,7 @@ namespace App.Presenters
     {
         private MainRootView _mainRootView;
         private readonly int _maxTsumuCount;
-        private readonly int _canSelectDistance = 300;
+        private readonly int _canSelectDistance = 180;
         private readonly Vector2[] _spawnPoint =
         {
             new Vector2(-225, 0), new Vector2(-150, 0), new Vector2(-75, 0),
