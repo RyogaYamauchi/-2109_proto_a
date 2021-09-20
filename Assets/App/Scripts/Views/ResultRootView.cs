@@ -6,6 +6,7 @@ using System;
 using App.Presenters;
 using App.Skills;
 using Cysharp.Threading.Tasks;
+using Photon.Pun;
 
 namespace App.Views
 {
@@ -31,6 +32,12 @@ namespace App.Views
         private Text _resultText;
         [SerializeField]
         private Text _rateltText;
+        [SerializeField]
+        private AudioClip LoseSound;
+        [SerializeField]
+        private AudioClip WinSound;
+        [SerializeField]
+        private AudioSource audioSource;
         public IObservable<Unit> OnClickTitle => _titleButton.OnClickAsObservable().TakeUntilDestroy(this);
         public IObservable<Unit> OnClickRetry => _retryButton.OnClickAsObservable().TakeUntilDestroy(this);
         public GameObject loseEnemy;
@@ -39,8 +46,8 @@ namespace App.Views
         public override UniTask OnLoadAsync()
         {
             var param = ((Parameter) GetParameter());
-            var presenter = new ResultRootPresenter(this);
             var winOrLose = param.IsWinOrLose;
+            var presenter = new ResultRootPresenter(this,winOrLose);
             Debug.Log(winOrLose);
             //_rateltText.text = "1300";
             if (winOrLose == true)
@@ -55,7 +62,30 @@ namespace App.Views
                 winEnemy.SetActive(false);
                 loseEnemy.SetActive(true);
             }
+            if (PhotonNetwork.IsMasterClient) 
+            {
+                var myRoom = PhotonNetwork.CurrentRoom;
+                myRoom.IsOpen = false;            // 部屋を閉じる
+                myRoom.IsVisible = false;         // ロビーから見えなくする
+            }
+            
+            PhotonNetwork.LeaveRoom();
+            PhotonNetwork.Disconnect();
+            
             return base.OnLoadAsync();
+        }
+        public void PlayBGM(bool winOrLose)
+        {
+            if (winOrLose)
+            {
+                audioSource.PlayOneShot(WinSound);
+
+            }
+            else
+            {
+                audioSource.PlayOneShot(LoseSound);
+            }
+
         }
         
     }

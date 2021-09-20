@@ -62,7 +62,7 @@ namespace App.Presenters
                 _mainRootView.SetSkillValue(_gameModel.SkillModel.SkillPoint.Value, _gameModel.SkillModel.MaxSkillPoint);
             }).AddTo(_mainRootView);
             _mainRootView.SetActiveSkillButton(false);
-            DebugReceiveDamage().Forget();
+            // DebugReceiveDamage().Forget();
         }
 
         private async UniTask DebugReceiveDamage()
