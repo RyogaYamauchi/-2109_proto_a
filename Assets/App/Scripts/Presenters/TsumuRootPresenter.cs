@@ -149,33 +149,8 @@ namespace App.Presenters
 
             _gameModel.TsumuRootModel.UnSelectTsumuAll();
         }
-
-        private async UniTask DespawnSelectingTsumusAsync()
-        {
-            var ids = _tsumuRootModel.GetSelectingTsumuIdList();
-            var chain = ids.Count;
-            var views = _tsumuViewList.Where(x => ids.Contains(x.Guid)).ToArray();
-            foreach (var view in views)
-            {
-                _gameModel.SkillModel.AddSkillPoint(1);
-                await DespawnTsumuAsync(view);
-                if (_gameModel.SkillModel.CanExecuteSkill(_skill))
-                {
-                    _mainRootView.SetActiveSkillButton(true);
-                }
-            }
-
-            if (views.Any(x => x.TsumuType == TsumuType.Heal))
-            {
-                _healTsumuNumReactiveProperty.Value = chain;
-            }
-            else
-            {
-                _attackDamageReactiveProperty.Value = chain * _tsumuRootModel.GetDamage(views[1].TsumuType);
-            }
-        }
-
-        private async UniTask DespawnTsumuAsync(TsumuView tsumuView)
+        
+        private async UniTask DespawnTsumuAsync(TsumuView tsumuView, int damage)
         {
             _tsumuViewList.Remove(tsumuView);
             if (tsumuView == null)
@@ -183,16 +158,15 @@ namespace App.Presenters
                 return;
             }
             var pos = tsumuView.transform.position;
-            PlayDamageView(pos, tsumuView).Forget();
+            PlayDamageView(pos, tsumuView, damage).Forget();
             await tsumuView.CloseAsync();
         }
 
-        private async UniTask PlayDamageView(Vector3 pos, TsumuView tsumuView)
+        private async UniTask PlayDamageView(Vector3 pos, TsumuView tsumuView, int damage)
         {
             var damageView = await CreateViewAsync<TsumuAttackNumView>();
             _mainRootView.SetParentTakeDamageNum(damageView);
             damageView.transform.position = pos;
-            var damage = _tsumuRootModel.GetDamage(tsumuView.TsumuType);
             damageView.Initialize(damage);
             await damageView.MoveToTarget(_mainRootView.GetEnemyPosition());
             if (damageView != null)
@@ -227,16 +201,20 @@ namespace App.Presenters
                 .Select(id => _tsumuViewList.FirstOrDefault(x =>id == x.Guid)).ToArray();
             _gameModel.TsumuRootModel.UnSelectTsumuAll();
             _closingViewList.AddRange(deleteTsumuList);
+            var sumDamage = 0;
+            var c = 0;
             foreach (var tsumu in deleteTsumuList)
             {
                 _gameModel.SkillModel.AddSkillPoint(1);
-
-                await DespawnTsumuAsync(tsumu);
+                var damage = _tsumuRootModel.CalcDamage(c, _tsumuRootModel.GetDamage(tsumu.TsumuType));
+                sumDamage += damage;
+                await DespawnTsumuAsync(tsumu,damage);
                 if (_gameModel.SkillModel.CanExecuteSkill(_skill))
                 {
                     _mainRootView.SetActiveSkillButton(true);
                 }
                 _closingViewList.Remove(tsumu);
+                c++;
             }
             
             if (views.Any(x => x.TsumuType == TsumuType.Heal))
@@ -245,7 +223,7 @@ namespace App.Presenters
             }
             else
             {
-                _attackDamageReactiveProperty.Value = chain;
+                _attackDamageReactiveProperty.Value = sumDamage;
             }
         }
 
@@ -300,11 +278,11 @@ namespace App.Presenters
             return _tsumuViewList.AsReadOnly();
         }
 
-        public async UniTask DespawnTsumuListAsync(List<TsumuView> targetTsumuList)
+        public async UniTask DespawnTsumuListAsync(List<(TsumuView, int)> targetTsumuList)
         {
             foreach (var view in targetTsumuList)
             {
-                DespawnTsumuAsync(view).Forget();
+                DespawnTsumuAsync(view.Item1,view.Item2 ).Forget();
             }
         }
 
