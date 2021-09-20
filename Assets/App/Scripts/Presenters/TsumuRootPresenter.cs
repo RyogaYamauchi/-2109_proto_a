@@ -84,6 +84,10 @@ namespace App.Presenters
             {
                 RefillTsumus();
             }).AddTo(_mainRootView);
+            _mainRootView.OnClickGoTitleButtonAsObservable.Subscribe(x =>
+            {
+                ChangeScene<TitleRootView>().Forget();
+            });
         }
         
         private void RefillTsumus()
@@ -270,8 +274,13 @@ namespace App.Presenters
         {
             foreach (var view in targetTsumuList)
             {
-                await DespawnTsumuAsync(view);
+                DespawnTsumuAsync(view).Forget();
             }
+        }
+
+        public IReadOnlyList<TsumuView> GetClosingTsumuList()
+        {
+            return _closingViewList.AsReadOnly();
         }
     }
 }

@@ -129,7 +129,7 @@ namespace App.Presenters.Matching
         private  void ChangeSceneToMain()
         {
             Debug.Log("main");
-            ChangeScene<MainRootView>(new MainRootView.Paramater(30, 300)).Forget();
+            ChangeScene<MainRootView>(new MainRootView.Paramater(30, 300, false)).Forget();
         }
 
     }

@@ -7,7 +7,7 @@ namespace App.Models
 {
     public class SkillModel
     {
-        private ISkill[] _enableSkills = {new OjamaSkill(), new DeleteLineSkill()};
+        private ISkill[] _enableSkills = { new DeleteLineSkill()};
 
         private int _maxSkillPoint = 0;
         private ReactiveProperty<int> _skillPoint = new ReactiveProperty<int>(0);

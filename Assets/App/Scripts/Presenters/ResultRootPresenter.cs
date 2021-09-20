@@ -1,5 +1,4 @@
 using App.Lib;
-using App.Skills;
 using App.Views;
 using UniRx;
 using Cysharp.Threading.Tasks;
@@ -15,6 +14,11 @@ namespace App.Presenters
             {
                 ChangeScene<MatchingRootView>().Forget();
                 rootView.PlayBGM(winOrLose);
+            });
+
+            rootView.OnClickTitle.Subscribe(x =>
+            {
+                ChangeScene<MainRootView>(new MainRootView.Paramater(30, 100, true)).Forget();
             });
         }
     }

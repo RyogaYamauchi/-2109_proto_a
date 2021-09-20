@@ -1,11 +1,9 @@
 ﻿using System;
 using App.Lib;
 using App.Presenters;
-using App.Skills;
 using Cysharp.Threading.Tasks;
 using UniRx;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace App.Views
@@ -17,11 +15,13 @@ namespace App.Views
         {
             public int MaxTsumuCount;
             public int MaxHp;
+            public bool IsSingleMode;
 
-            public Paramater(int maxTsumuCount, int maxHp)
+            public Paramater(int maxTsumuCount, int maxHp, bool isSingleMode)
             {
                 MaxTsumuCount = maxTsumuCount;
                 MaxHp = maxHp;
+                IsSingleMode = isSingleMode;
             }
         }
         [SerializeField] private Button _button;
@@ -34,27 +34,40 @@ namespace App.Views
         [SerializeField] private TimerView timerView;
         [SerializeField] private BattleView battleView;
         [SerializeField] private Slider _skillSlider;
+        [SerializeField] private Button _goTitleButton;
 
         public IObservable<Unit> OnClickSkillAsObservable => _button.OnClickAsObservable().TakeUntilDestroy(this);
+
+        public IObservable<Unit> OnClickGoTitleButtonAsObservable =>
+            _goTitleButton.OnClickAsObservable().TakeUntilDestroy(this);
 
         // デバッグ機能、シーン単体で起動できる
         private void Start()
         {
             if (!IsLoading && !IsLoaded)
             {
-                // デバッグではDeleteLineSkillを使用
-                Debug.Log("OnPlayDebug");
-                var presenter = new TsumuRootPresenter(this, new Paramater(30, 300));
-                presenter.Initialize();
-                presenter.SetEvents();
-                
-                // var battlePresenter = new BattlePresenter(presenter, timerView, battleView);
-                // battlePresenter.Initialize();
+                SingleModeSetUp();
             }
+        }
+
+        private void SingleModeSetUp()
+        {
+            Debug.Log("OnPlaySingle");
+            var presenter = new TsumuRootPresenter(this, new Paramater(30, 300, true));
+            presenter.Initialize();
+            presenter.SetEvents();
+            _goTitleButton.gameObject.SetActive(true);
         }
 
         public override UniTask OnLoadAsync()
         {
+            _goTitleButton.gameObject.SetActive(false);
+            var param = (Paramater)Parameter;
+            if (param.IsSingleMode)
+            {
+                SingleModeSetUp();
+                return UniTask.CompletedTask;
+            }
             var presenter = new TsumuRootPresenter(this, Parameter);
             presenter.Initialize();
             

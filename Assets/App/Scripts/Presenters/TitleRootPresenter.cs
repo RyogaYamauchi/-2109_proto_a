@@ -13,6 +13,11 @@ namespace App.Presenters
             {
                 ChangeScene<MatchingRootView>().Forget();
             });
+
+            rootView.OnClickSingle.Subscribe(x =>
+            {
+                ChangeScene<MainRootView>(new MainRootView.Paramater(30 , 500, true)).Forget();
+            });
         }
     }
 }
