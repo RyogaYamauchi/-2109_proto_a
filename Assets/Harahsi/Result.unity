@@ -1118,7 +1118,7 @@ MonoBehaviour:
   _resultText: {fileID: 570713766}
   _rateltText: {fileID: 0}
   LoseSound: {fileID: 8300000, guid: 81e4c3919baec4f40b9b97263b9057f6, type: 3}
-  WinSound: {fileID: 8300000, guid: 97a8bb474e9644b21a43830c294fba77, type: 3}
+  WinSound: {fileID: 8300000, guid: ae77f02365b32426ab8a6108430c14af, type: 3}
   audioSource: {fileID: 1746943320}
   loseEnemy: {fileID: 340926353}
   winEnemy: {fileID: 1712411758}
