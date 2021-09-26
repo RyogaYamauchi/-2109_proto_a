@@ -4,7 +4,7 @@ using UnityEngine;
 namespace App.MasterData
 {
     [CreateAssetMenu]
-    public class TsumuData : ScriptableObject
+    public class MasterTsumu : ScriptableObject
     {
         [SerializeField] private TsumuType _tsumuType;
         [SerializeField] private GameObject _colliderGameObject ;

@@ -30,14 +30,6 @@ namespace App.Presenters
             _battleView = battleView;
             _isWin = false;
         }
-        
-        public BattlePresenter(TimerView view)
-        {
-            _playerParameter = new PlayerParameter(100);
-            _timer = new OnlineTimer(5, 120);
-            
-            _timerView = view;
-        }
 
         public void Initialize()
         {
@@ -201,22 +193,6 @@ namespace App.Presenters
             GameModel.Instance.PlayerParameter.RecieveDamage(damage);
         }
 
-        /// <summary>
-        /// 消したツムの数でダメージを計算
-        /// </summary>
-        /// <param name="tsumuNum"></param>
-        /// <returns></returns>
-        private float CalculateDamage(int tsumuNum)
-        {
-            var damage = tsumuNum;
-
-            // コンボ倍率
-            // damage *= _playerParameter.Combo;
-
-            return damage;
-        }
-        
-        
         /// <summary>
         /// 消したツムの数で回復量を計算
         /// </summary>

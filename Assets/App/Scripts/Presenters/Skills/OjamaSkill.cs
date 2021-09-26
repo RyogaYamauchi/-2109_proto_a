@@ -12,12 +12,12 @@ using App.Types;
 
 namespace App.Skills
 {
-    public class OjamaSkill : ISkill
+    public class OjamaSkill : ISkill, IApplyEnemySkill
     {
         private readonly int NeedValue = 30;
-        private List<TsumuData> LoadTsumuData()
+        private List<MasterTsumu> LoadTsumuData()
         {
-            return Resources.LoadAll<TsumuData>("MasterData/").ToList();
+            return Resources.LoadAll<MasterTsumu>("MasterData/").ToList();
         }
 
         public async UniTask ExecuteAsync(TsumuRootPresenter presenter)

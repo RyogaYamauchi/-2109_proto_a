@@ -13,15 +13,15 @@ namespace App.Models
     {
         private List<TsumuModel> _tsumuList = new List<TsumuModel>();
         private List<Guid> _selectingTsumuIdList = new List<Guid>();
-        private List<TsumuData> _tsumuDataList = new List<TsumuData>();
+        private List<MasterTsumu> _tsumuDataList = new List<MasterTsumu>();
 
-        private List<TsumuData> _cacheTsumuData = new List<TsumuData>();
+        private List<MasterTsumu> _cacheTsumuData = new List<MasterTsumu>();
 
-        private List<TsumuData> LoadTsumuData()
+        private List<MasterTsumu> LoadTsumuData()
         {
             if (_cacheTsumuData.Count == 0)
             {
-                _cacheTsumuData = Resources.LoadAll<TsumuData>("MasterData/")
+                _cacheTsumuData = Resources.LoadAll<MasterTsumu>("MasterData/")
                     .Where(x => x.TsumuType != TsumuType.Ojama).ToList();
             }
 
@@ -70,12 +70,12 @@ namespace App.Models
             var lastModel = GetModel(lastGuid);
             var targetModel = GetModel(guid);
 
-            if (targetModel.TsumuData.TsumuType == TsumuType.Ojama)
+            if (targetModel.MasterTsumu.TsumuType == TsumuType.Ojama)
             {
                 return false;
             }
 
-            if (lastModel.TsumuData.TsumuType != targetModel.TsumuData.TsumuType)
+            if (lastModel.MasterTsumu.TsumuType != targetModel.MasterTsumu.TsumuType)
             {
                 return false;
             }
@@ -98,11 +98,11 @@ namespace App.Models
             return GetSelectingTsumuCount();
         }
 
-        public void ChangeStateTsumuModel(Guid currentGuid, Guid changedGuid, TsumuData tsumuData)
+        public void ChangeStateTsumuModel(Guid currentGuid, Guid changedGuid, MasterTsumu masterTsumu)
         {
             var currentModel = GetModel(currentGuid);
             _tsumuList.Remove(currentModel);
-            var changedModel = new TsumuModel(changedGuid, tsumuData);
+            var changedModel = new TsumuModel(changedGuid, masterTsumu);
             _tsumuList.Add(changedModel);
         }
 

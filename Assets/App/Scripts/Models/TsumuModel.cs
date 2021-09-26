@@ -7,12 +7,12 @@ namespace App.Models
     public sealed class TsumuModel
     {
         public Guid Guid { get; }
-        public TsumuData TsumuData { get; }
+        public MasterTsumu MasterTsumu { get; }
 
-        public TsumuModel(Guid guid, TsumuData tsumuData)
+        public TsumuModel(Guid guid, MasterTsumu masterTsumu)
         {
             Guid = guid;
-            TsumuData = tsumuData;
+            MasterTsumu = masterTsumu;
         }
     }
 }

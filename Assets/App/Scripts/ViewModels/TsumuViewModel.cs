@@ -6,15 +6,15 @@ namespace App.ViewModels
 {
     public readonly struct TsumuViewModel
     {
-        public readonly TsumuData TsumuData;
+        public readonly MasterTsumu MasterTsumu;
         public readonly Guid Guid;
         public readonly GameObject ColiderObject;
 
-        public TsumuViewModel(TsumuData tsumuData, Guid guid)
+        public TsumuViewModel(MasterTsumu masterTsumu, Guid guid)
         {
-            TsumuData = tsumuData;
+            MasterTsumu = masterTsumu;
             Guid = guid;
-            ColiderObject = tsumuData.ColliderObject;
+            ColiderObject = masterTsumu.ColliderObject;
         }
     }
 }

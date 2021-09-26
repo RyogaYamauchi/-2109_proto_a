@@ -63,16 +63,6 @@ namespace App.Presenters
                 _mainRootView.SetSkillValue(_gameModel.SkillModel.SkillPoint.Value, _gameModel.SkillModel.MaxSkillPoint);
             }).AddTo(_mainRootView);
             _mainRootView.SetActiveSkillButton(false);
-            // DebugReceiveDamage().Forget();
-        }
-
-        private async UniTask DebugReceiveDamage()
-        {
-            for (var i = 0; i < 20; i++)
-            {
-                await UniTask.Delay(500); 
-                _gameModel.PlayerParameter.RecieveDamage(5);
-            }
         }
 
         public void SetEvents()
@@ -110,7 +100,14 @@ namespace App.Presenters
         {
             _gameModel.SkillModel.ClearSkillPoint();
             _mainRootView.SetActiveSkillButton(false);
-            await skill.ExecuteAsync(this);
+            if (skill is IApplyMySelfSkill)
+            {
+                await skill.ExecuteAsync(this);
+            }
+            else if (skill is IApplyEnemySkill)
+            {
+                // 相手の盤面に出したいawait skill
+            }
         }
         
         private async UniTask SpawnTsumuAsync()

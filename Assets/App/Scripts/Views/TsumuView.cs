@@ -28,7 +28,7 @@ namespace App.Views
         public IObservable<TsumuView> OnPointerDownAsObservable => _onPointerDownSubject.TakeUntilDestroy(this);
 
         private TsumuViewModel _tsumuViewModel;
-        public TsumuType TsumuType => _tsumuViewModel.TsumuData.TsumuType;
+        public TsumuType TsumuType => _tsumuViewModel.MasterTsumu.TsumuType;
         public Guid Guid => _tsumuViewModel.Guid;
         private GameObject _instance;
 

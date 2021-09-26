@@ -5,7 +5,7 @@ using Cysharp.Threading.Tasks;
 
 namespace App.Skills
 {
-    public class DeleteLineSkill : ISkill
+    public class DeleteLineSkill : ISkill, IApplyMySelfSkill
     {
         //画面の真ん中１列のツムを削除する、
         private readonly int YRange = 100;
