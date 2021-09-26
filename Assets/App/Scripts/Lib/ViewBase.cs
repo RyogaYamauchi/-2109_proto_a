@@ -9,6 +9,16 @@ namespace App.Lib
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         protected CancellationToken _cancellationToken => _cancellationTokenSource.Token;
 
+        public void SetUp()
+        {
+            OnSetUp();
+        }
+
+        protected virtual void OnSetUp()
+        {
+            
+        }
+
         public void Dispose()
         {
             _cancellationTokenSource.Cancel();

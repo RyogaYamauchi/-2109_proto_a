@@ -23,6 +23,7 @@ namespace App.Views
                 IsSingleMode = isSingleMode;
             }
         }
+
         [SerializeField] private Button _button;
         [SerializeField] private Transform _tsumuSpawnRoot;
         [SerializeField] private Transform _tsumuRoot;
@@ -43,26 +44,22 @@ namespace App.Views
 
         public IObservable<Unit> OnClickGoTitleButtonAsObservable =>
             _goTitleButton.OnClickAsObservable().TakeUntilDestroy(this);
-        
+
         private void SingleModeSetUp()
         {
-            Debug.Log("OnPlaySingle");
-            var presenter = new MainRootPresenter(this, new Paramater(30, 300, true));
-            presenter.Initialize();
-            presenter.SetEvents();
             _goTitleButton.gameObject.SetActive(true);
         }
 
         public void Initialize()
         {
             _goTitleButton.gameObject.SetActive(false);
-           
-                SingleModeSetUp();
 
-                //var battlePresenter = new BattlePresenter(presenter, timerView, battleView);
+            SingleModeSetUp();
+
+            //var battlePresenter = new BattlePresenter(presenter, timerView, battleView);
             //battlePresenter.Initialize();
         }
-        
+
         public void SetParentTsumu(TsumuView tsumuView)
         {
             tsumuView.transform.SetParent(_tsumuRoot, false);
@@ -124,6 +121,7 @@ namespace App.Views
             {
                 skillMaxTime = 0f;
             }
+
             skillMaxImage.color = Color.Lerp(skillMaxColor, Color.clear, skillMaxTime);
         }
 

@@ -1,12 +1,9 @@
-using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using App.Lib;
 using App.Presenters.Matching;
 using App.Views;
 using UniRx;
-using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace App.Presenters
 {
@@ -15,8 +12,8 @@ namespace App.Presenters
     {
         protected override UniTask OnLoadAsync(CancellationToken cancellationToken)
         {
-            var obj = SceneManager.GetActiveScene().GetRootGameObjects();
-            var rootView = obj.FirstOrDefault(x => x.GetComponent<TitleRootView>())?.GetComponent<TitleRootView>();
+
+            var rootView = GetRootView<TitleRootView>();
             rootView.OnClickOnline.Subscribe(x =>
             {
                 ChangeScene<MatchingRootPresenter>().Forget();

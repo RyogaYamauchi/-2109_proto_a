@@ -48,6 +48,7 @@ namespace App.Lib
             var path = PrefabPath.GetPrefabPath(typeof(T));
             var obj = await Resources.LoadAsync<T>(path) as T;
             var instance = Object.Instantiate(obj, parent, false);
+            instance.SetUp();
             return instance;
         }
 

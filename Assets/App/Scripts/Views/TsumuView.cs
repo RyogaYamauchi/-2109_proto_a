@@ -32,7 +32,7 @@ namespace App.Views
         public Guid Guid => _tsumuViewModel.Guid;
         private GameObject _instance;
 
-        public void Initialize()
+        protected override void OnSetUp()
         {
             _button.OnPointerEnterAsObservable().Subscribe(x => _onPointerEnterSubject.OnNext(this)).AddTo(this);
             _button.OnPointerUpAsObservable().Subscribe(x => _onPointerUpSubject.OnNext(this)).AddTo(this);

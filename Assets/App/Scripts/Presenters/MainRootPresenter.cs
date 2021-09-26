@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using App.Lib;
 using App.Models;
@@ -18,7 +19,6 @@ namespace App.Presenters
     public sealed class MainRootPresenter : RootPresenterBase<MainRootPresenter>
     {
         private MainRootView _mainRootView;
-        private readonly int _maxTsumuCount;
         private readonly int _canSelectDistance = 250;
         private readonly Vector2[] _spawnPoint =
         {
@@ -30,6 +30,7 @@ namespace App.Presenters
         private List<TsumuView> _tsumuViewList = new List<TsumuView>();
         private List<Vector2> _canSpawnTsumuPoints = new List<Vector2>();
         private List<TsumuView> _closingViewList = new List<TsumuView>();
+        private int _maxTsumuCount;
 
         private ISkill _skill;
         
@@ -40,19 +41,14 @@ namespace App.Presenters
         // 回復ツム消した数
         private readonly ReactiveProperty<int> _healTsumuNumReactiveProperty = new ReactiveProperty<int>(0);
         public IObservable<int> HealTsumuNumObservable => _healTsumuNumReactiveProperty;
-        
-        
 
-        public MainRootPresenter(MainRootView view, IParameter parameter)
+        protected override UniTask OnLoadAsync(CancellationToken cancellationToken)
         {
-            var param = (MainRootView.Paramater) parameter;
+            var param = (MainRootView.Paramater)_parameter;
             _maxTsumuCount = param.MaxTsumuCount;
-            Debug.Log(_maxTsumuCount);
-            _mainRootView = view;
-        }
-        
-        public void Initialize()
-        {
+
+            _mainRootView = GetRootView<MainRootView>();
+
             _gameModel.TsumuRootModel.Initialize();
             _gameModel.PlayerParameter.Clear();
             _skill = _gameModel.SkillModel.GetRandomSkill();
@@ -64,6 +60,8 @@ namespace App.Presenters
                 _mainRootView.SetSkillValue(_gameModel.SkillModel.SkillPoint.Value, _gameModel.SkillModel.MaxSkillPoint);
             }).AddTo(_mainRootView);
             _mainRootView.SetActiveSkillButton(false);
+            SetEvents();
+            return UniTask.CompletedTask;
         }
 
         public void SetEvents()
