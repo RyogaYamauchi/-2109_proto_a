@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a168975c5d8a4ccd97180b306bc5d130, type: 3}
-  m_Name: Green
+  m_Name: Cloud
   m_EditorClassIdentifier: 
-  _tsumuType: 1
-  _colliderGameObject: {fileID: 5684856827884847655, guid: 7d5a8dd64c5c2b94689b67c2c4ef05f3, type: 3}
+  _tsumuType: 3
+  _colliderGameObject: {fileID: 5684856827884847655, guid: 267f6076a3f6f0349a3ce3c42fea6af0, type: 3}
   _attackPoint: 2

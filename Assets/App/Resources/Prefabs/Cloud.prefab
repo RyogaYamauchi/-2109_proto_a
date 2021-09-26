@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: 8374501225838661221}
   - component: {fileID: 8712719522058259562}
   m_Layer: 5
-  m_Name: YellowTsumuCollider
+  m_Name: Cloud
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 5684856827884847654}
   - component: {fileID: 5684856827884847652}
   - component: {fileID: 7030448950755457454}
-  - component: {fileID: 6698464485004622259}
+  - component: {fileID: 7222384599790595388}
   m_Layer: 5
-  m_Name: BlueTsumuCollider
+  m_Name: TriangleTsumuCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -66,7 +66,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 0e5a315718720473ab63a1e7725d47f3, type: 3}
+  m_Sprite: {fileID: 21300000, guid: df97e50227bce4d67a77a4b0a9528cd7, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -76,7 +76,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!60 &6698464485004622259
+--- !u!60 &7222384599790595388
 PolygonCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -101,14 +101,8 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: 24.797638, y: 3.527954}
-      - {x: 24.03711, y: 22.747864}
-      - {x: 0.7658929, y: 74.13732}
-      - {x: -23.124939, y: 24.484009}
-      - {x: -73.27147, y: 17.504948}
-      - {x: -36.171356, y: -20.864563}
-      - {x: -46.73059, y: -74.613525}
-      - {x: 0.2529297, y: -47.155334}
-      - {x: 44.655838, y: -74.63732}
-      - {x: 36.766235, y: -21.130249}
-      - {x: 73.63474, y: 16.906063}
+    - - {x: 0, y: 1}
+      - {x: -0.21399605, y: 74.38311}
+      - {x: 75.697495, y: -74.88311}
+      - {x: -75.697464, y: -75.62017}
+      - {x: 0.21399593, y: 74.01458}

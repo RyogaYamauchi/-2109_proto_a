@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a168975c5d8a4ccd97180b306bc5d130, type: 3}
-  m_Name: Yellow
+  m_Name: Square
   m_EditorClassIdentifier: 
-  _tsumuType: 3
-  _colliderGameObject: {fileID: 5684856827884847655, guid: 267f6076a3f6f0349a3ce3c42fea6af0, type: 3}
-  _attackPoint: 2
+  _tsumuType: 0
+  _colliderGameObject: {fileID: 5684856827884847655, guid: 84d98987aed7c224eb26d752004ebaf4, type: 3}
+  _attackPoint: 3

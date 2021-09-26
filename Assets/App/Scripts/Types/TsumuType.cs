@@ -2,10 +2,10 @@
 {
     public enum TsumuType
     {
-        Red,
-        Green,
-        Blue,
-        Yellow,
+        Square,
+        Triangle,
+        Star,
+        Cloud,
         Heal,
         Ojama
     }
