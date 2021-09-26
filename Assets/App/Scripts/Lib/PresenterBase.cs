@@ -1,54 +1,74 @@
 ﻿using System;
-using System.Linq;
+using System.Threading;
+using App.Common;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using Zenject;
 using Object = UnityEngine.Object;
 
 namespace App.Lib
 {
-    public abstract class PresenterBase
+    public abstract class PresenterBase : IDisposable
     {
-        private RootViewBase _rootViewBase;
+        protected DiContainer _container;
+        private CommonSceneManager _commonSceneManager;
+
+        [Inject]
+        public void Construct(DiContainer container, CommonSceneManager commonSceneManager)
+        {
+            _container = container;
+            _commonSceneManager = commonSceneManager;
+        }
+
+        public Action OnClosed;
+
+       
+        public async UniTask LoadAsync(CancellationToken cancellationToken)
+        {
+            await OnLoadAsync(cancellationToken);
+        }
+
+        public async UniTask DidLoadAsync(CancellationToken cancellationToken)
+        {
+            await OnDidLoadAsync(cancellationToken);
+        }
+
+        protected virtual UniTask OnLoadAsync(CancellationToken cancellationToken)
+        {
+            return UniTask.CompletedTask;
+        }
+
+        protected virtual UniTask OnDidLoadAsync(CancellationToken cancellationToken)
+        {
+            return UniTask.CompletedTask;
+        }
+
         protected async UniTask<T> CreateViewAsync<T>(Transform parent = null) where T : ViewBase
         {
             var path = PrefabPath.GetPrefabPath(typeof(T));
             var obj = await Resources.LoadAsync<T>(path) as T;
             var instance = Object.Instantiate(obj, parent, false);
-            instance.SetLoading(true);
-            await instance.LoadAsync();
-            await instance.DidLoadAsync();
-            instance.SetLoading(false);
-            instance.SetLoaded(true);
             return instance;
         }
 
-        protected async UniTask<T> ChangeScene<T>(IParameter parameter = null) where T : RootViewBase
+        protected async UniTask<P> ChangeScene<P>(IParameter parameter = null) where  P : RootPresenterBase<P>
         {
-            var type = typeof(T);
+            var type = typeof(P);
             var name = RootSceneName.GetRootSceneName(type);
-            SceneManager.sceneLoaded += GetRootViewBase<T>;
-            await SceneManager.LoadSceneAsync(name);
-            SceneManager.sceneLoaded -= GetRootViewBase<T>;
-            var rootViewBase = (T) _rootViewBase;
-            rootViewBase.SetParameter(parameter);
-            rootViewBase.SetLoading(true);
-            await _rootViewBase.LoadAsync();
-            await rootViewBase.DidLoadAsync();
-            rootViewBase.SetLoading(false);
-            rootViewBase.SetLoaded(true);
-            return (T) _rootViewBase;
+            await _commonSceneManager.ReplaceSceneAsync(name);
+            var rootPresenter = _container.Resolve<P>();
+            var cancellationTokenSource = new CancellationTokenSource();
+            var token = cancellationTokenSource.Token;
+            rootPresenter.OnClosed += () => cancellationTokenSource.Cancel();
+            rootPresenter.SetParameter(parameter);
+            await rootPresenter.LoadAsync(token);
+            await rootPresenter.DidLoadAsync(token);
+            return rootPresenter;
         }
 
-        private void GetRootViewBase<T>(Scene scene, LoadSceneMode mode) where T : RootViewBase
+        public void Dispose()
         {
-            var gameObject = scene.GetRootGameObjects().FirstOrDefault(x => x.GetComponent<T>() != null);
-            if (gameObject == null)
-            {
-                throw new NullReferenceException("ロードしたシーンのルートに指定の型のオブジェクトがありませんでした");
-            }
-
-            _rootViewBase = gameObject.GetComponent<T>();
+            OnClosed.Invoke();
         }
     }
 }

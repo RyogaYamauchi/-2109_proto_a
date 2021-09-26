@@ -8,7 +8,6 @@ using UnityEngine.UI;
 
 namespace App.Views
 {
-    [RootSceneName(("MainScene"))]
     public sealed class MainRootView : RootViewBase
     {
         public class Paramater : IParameter
@@ -44,40 +43,24 @@ namespace App.Views
 
         public IObservable<Unit> OnClickGoTitleButtonAsObservable =>
             _goTitleButton.OnClickAsObservable().TakeUntilDestroy(this);
-
-        // デバッグ機能、シーン単体で起動できる
-        private void Start()
-        {
-            if (!IsLoading && !IsLoaded)
-            {
-                SingleModeSetUp();
-            }
-        }
-
+        
         private void SingleModeSetUp()
         {
             Debug.Log("OnPlaySingle");
-            var presenter = new TsumuRootPresenter(this, new Paramater(30, 300, true));
+            var presenter = new MainRootPresenter(this, new Paramater(30, 300, true));
             presenter.Initialize();
             presenter.SetEvents();
             _goTitleButton.gameObject.SetActive(true);
         }
 
-        public override UniTask OnLoadAsync()
+        public void Initialize()
         {
             _goTitleButton.gameObject.SetActive(false);
-            var param = (Paramater)Parameter;
-            if (param.IsSingleMode)
-            {
+           
                 SingleModeSetUp();
-                return UniTask.CompletedTask;
-            }
-            var presenter = new TsumuRootPresenter(this, Parameter);
-            presenter.Initialize();
-            
-            var battlePresenter = new BattlePresenter(presenter, timerView, battleView);
-            battlePresenter.Initialize();
-            return base.OnLoadAsync();
+
+                //var battlePresenter = new BattlePresenter(presenter, timerView, battleView);
+            //battlePresenter.Initialize();
         }
         
         public void SetParentTsumu(TsumuView tsumuView)

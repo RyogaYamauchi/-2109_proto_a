@@ -1,23 +1,32 @@
-using UniRx;
+using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using App.Lib;
+using App.Presenters.Matching;
 using App.Views;
+using UniRx;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace App.Presenters
 {
-    public class TitleRootPresenter : RootPresenterBase
+    [RootSceneName("Title")]
+    public class TitleRootPresenter : RootPresenterBase<TitleRootPresenter>
     {
-        public TitleRootPresenter(TitleRootView rootView)
+        protected override UniTask OnLoadAsync(CancellationToken cancellationToken)
         {
+            var obj = SceneManager.GetActiveScene().GetRootGameObjects();
+            var rootView = obj.FirstOrDefault(x => x.GetComponent<TitleRootView>())?.GetComponent<TitleRootView>();
             rootView.OnClickOnline.Subscribe(x =>
             {
-                ChangeScene<MatchingRootView>().Forget();
+                ChangeScene<MatchingRootPresenter>().Forget();
             });
 
             rootView.OnClickSingle.Subscribe(x =>
             {
-                ChangeScene<MainRootView>(new MainRootView.Paramater(30 , 500, true)).Forget();
+                ChangeScene<MainRootPresenter>(new MainRootView.Paramater(30 , 500, true)).Forget();
             });
+            return base.OnLoadAsync(cancellationToken);
         }
     }
 }

@@ -19,23 +19,8 @@ namespace App.Views
         private void Start()
         {
             tweener = loadingImage.transform.DOLocalRotate(new Vector3(0, 0, 180), 1).SetLoops(-1, LoopType.Yoyo);
-            if (!IsLoading && !IsLoaded)
-            {
-                // デバッグではDeleteLineSkillを使用
-                Debug.Log("OnPlayDebug");
-                var presenter = new MatchingPresenter(matchingStateView);
-            }
-        }
-
-        public override UniTask OnLoadAsync()
-        {
-            var presenter = new MatchingPresenter(matchingStateView);
-            return base.OnLoadAsync();
-        }
-
-        public void Update()
-        {
-            //loadingImage.transform.DOLocalRotate(new Vector3(0f, 0f, 360f), 5f, RotateMode.FastBeyond360).SetEase(Ease.Linear).SetLoops(-1,LoopType.Restart);
+            Debug.Log("OnPlayDebug");
+            var presenter = new MatchingRootPresenter(matchingStateView);
         }
     }
 }

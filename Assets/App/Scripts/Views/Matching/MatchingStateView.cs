@@ -29,7 +29,7 @@ namespace App.View.Matching
         private readonly Subject<Unit> _changeScene = new Subject<Unit>();
         public IObservable<Unit> ChangeScene => _changeScene;
 
-        private MatchingPresenter _matchingPresenter;
+        private MatchingRootPresenter _matchingRootPresenter;
 
         private bool _isChange = false;
         

@@ -14,7 +14,8 @@ using UnityEngine;
 
 namespace App.Presenters
 {
-    public sealed class TsumuRootPresenter : RootPresenterBase
+    [RootSceneName(("MainScene"))]
+    public sealed class MainRootPresenter : RootPresenterBase<MainRootPresenter>
     {
         private MainRootView _mainRootView;
         private readonly int _maxTsumuCount;
@@ -42,7 +43,7 @@ namespace App.Presenters
         
         
 
-        public TsumuRootPresenter(MainRootView view, IParameter parameter)
+        public MainRootPresenter(MainRootView view, IParameter parameter)
         {
             var param = (MainRootView.Paramater) parameter;
             _maxTsumuCount = param.MaxTsumuCount;
@@ -77,7 +78,7 @@ namespace App.Presenters
             }).AddTo(_mainRootView);
             _mainRootView.OnClickGoTitleButtonAsObservable.Subscribe(x =>
             {
-                ChangeScene<TitleRootView>().Forget();
+                ChangeScene<TitleRootPresenter>().Forget();
             });
         }
         

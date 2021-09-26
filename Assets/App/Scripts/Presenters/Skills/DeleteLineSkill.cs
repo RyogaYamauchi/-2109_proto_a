@@ -11,10 +11,10 @@ namespace App.Skills
         private readonly int YRange = 100;
         private readonly int NeedValue = 30;
 
-        public async UniTask ExecuteAsync(TsumuRootPresenter tsumuRootPresenter)
+        public async UniTask ExecuteAsync(MainRootPresenter mainRootPresenter)
         {
-            var tsumuList = tsumuRootPresenter.GetReadOnLyTsumuList();
-            var animatingList = tsumuRootPresenter.GetClosingTsumuList();
+            var tsumuList = mainRootPresenter.GetReadOnLyTsumuList();
+            var animatingList = mainRootPresenter.GetClosingTsumuList();
             var selectingList = GameModel.Instance.TsumuRootModel.GetSelectingTsumuIdList();
             var targetList = tsumuList
                 .Where(x => !animatingList.Contains(x))
@@ -36,8 +36,8 @@ namespace App.Skills
                 return (view, GameModel.Instance.TsumuRootModel.CalcDamage(cnt, (GameModel.Instance.TsumuRootModel.GetDamage(view.TsumuType))));
             });
 
-            await tsumuRootPresenter.DespawnTsumuListAsync(a.ToList());
-            tsumuRootPresenter.TakeDamage(a.Sum(x => x.Item2));
+            await mainRootPresenter.DespawnTsumuListAsync(a.ToList());
+            mainRootPresenter.TakeDamage(a.Sum(x => x.Item2));
             //GameModel.Instance.TsumuRootModel.UnSelectTsumuAll();
             foreach (var target in targetList)
             {

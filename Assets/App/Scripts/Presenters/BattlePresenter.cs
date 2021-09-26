@@ -12,15 +12,15 @@ namespace App.Presenters
     public class BattlePresenter : PresenterBase
     {
         private readonly PlayerParameter _playerParameter;
-        private TsumuRootPresenter _tsumuRootPresenter;
+        private MainRootPresenter _mainRootPresenter;
         private BattleView _battleView;
         private TimerView _timerView;
         private readonly OnlineTimer _timer;
         private bool _isWin;
 
-        public BattlePresenter(TsumuRootPresenter tsumuRootPresenter, TimerView timerView, BattleView battleView)
+        public BattlePresenter(MainRootPresenter mainRootPresenter, TimerView timerView, BattleView battleView)
         {
-            _tsumuRootPresenter = tsumuRootPresenter;
+            _mainRootPresenter = mainRootPresenter;
 
             // scriptableObjectかPrefabとかで設定したい
             _playerParameter = new PlayerParameter(100);
@@ -58,7 +58,7 @@ namespace App.Presenters
             
             _timer.ObserveEveryValueChanged(x => x.IsStart)
                 .Where(x => x)
-                .Subscribe( _ => _tsumuRootPresenter.SetEvents())
+                .Subscribe( _ => _mainRootPresenter.SetEvents())
                 .AddTo(_timerView);
 
             // resultに遷移
@@ -74,7 +74,7 @@ namespace App.Presenters
             
             // ツム消した通知を受け取る
             // 攻撃
-            _tsumuRootPresenter.AttackDamageObservable
+            _mainRootPresenter.AttackDamageObservable
                 .Skip(1)
                 .Subscribe(damage =>
                 {
@@ -83,7 +83,7 @@ namespace App.Presenters
                 .AddTo(_battleView);
 
             // 回復
-            _tsumuRootPresenter.HealTsumuNumObservable
+            _mainRootPresenter.HealTsumuNumObservable
                 .Skip(1)
                 .Subscribe(num =>
                 {
@@ -234,7 +234,7 @@ namespace App.Presenters
         /// </summary>
         private void ChangeSceneToResult()
         {
-            ChangeScene<ResultRootView>(new ResultRootView.Parameter(_isWin, null)).Forget();
+            ChangeScene<ResultRootPresenter>(new ResultRootView.Parameter(_isWin, null)).Forget();
         }
     }
 }

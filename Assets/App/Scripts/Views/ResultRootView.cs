@@ -3,14 +3,11 @@ using UniRx;
 using UnityEngine.UI;
 using App.Lib;
 using System;
-using App.Presenters;
 using App.Skills;
-using Cysharp.Threading.Tasks;
 using Photon.Pun;
 
 namespace App.Views
 {
-    [RootSceneName("Result")]
     public class ResultRootView : RootViewBase
     {
         public class Parameter : IParameter
@@ -43,13 +40,9 @@ namespace App.Views
         public GameObject loseEnemy;
         public GameObject winEnemy;
 
-        public override UniTask OnLoadAsync()
+        public void Initialize()
         {
-            var param = ((Parameter) GetParameter());
-            var winOrLose = param.IsWinOrLose;
-            var presenter = new ResultRootPresenter(this,winOrLose);
-            Debug.Log(winOrLose);
-            //_rateltText.text = "1300";
+            var winOrLose = true;
             if (winOrLose == true)
             {
                 _resultText.text = "You win";
@@ -73,8 +66,6 @@ namespace App.Views
             
             PhotonNetwork.LeaveRoom();
             PhotonNetwork.Disconnect();
-            
-            return base.OnLoadAsync();
         }
         public void PlayBGM(bool winOrLose)
         {

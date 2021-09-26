@@ -32,12 +32,11 @@ namespace App.Views
         public Guid Guid => _tsumuViewModel.Guid;
         private GameObject _instance;
 
-        public override UniTask OnLoadAsync()
+        public void Initialize()
         {
             _button.OnPointerEnterAsObservable().Subscribe(x => _onPointerEnterSubject.OnNext(this)).AddTo(this);
             _button.OnPointerUpAsObservable().Subscribe(x => _onPointerUpSubject.OnNext(this)).AddTo(this);
             _button.OnPointerDownAsObservable().Subscribe(x => _onPointerDownSubject.OnNext(this)).AddTo(this);
-            return base.OnLoadAsync();
         }
 
         public void ChangeColor(bool state)

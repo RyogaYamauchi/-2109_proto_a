@@ -1,16 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
 using App.Lib;
-using App.Presenters;
-using App.Skills;
 using System;
+using App.Common;
+using App.Presenters;
 
 namespace App.Views
 {
-    [RootSceneName("Title")]
     public class TitleRootView : RootViewBase
     {
         [SerializeField] private Button _OnlineButton;
@@ -18,9 +15,10 @@ namespace App.Views
         [SerializeField] private Button _singlePlayButton;
         public IObservable<Unit> OnClickOnline => _OnlineButton.OnClickAsObservable().TakeUntilDestroy(this);
         public IObservable<Unit> OnClickSingle => _singlePlayButton.OnClickAsObservable().TakeUntilDestroy(this);
-        void Start()
+
+        private void Awake()
         {
-            var presenter = new TitleRootPresenter(this);
+            PlayFromEditor<TitleRootPresenter>();
         }
     }
 }

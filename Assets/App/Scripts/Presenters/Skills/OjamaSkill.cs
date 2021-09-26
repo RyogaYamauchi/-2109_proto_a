@@ -20,7 +20,7 @@ namespace App.Skills
             return Resources.LoadAll<MasterTsumu>("MasterData/").ToList();
         }
 
-        public async UniTask ExecuteAsync(TsumuRootPresenter presenter)
+        public async UniTask ExecuteAsync(MainRootPresenter presenter)
         {
             var tsumuList = presenter.GetReadOnLyTsumuList();
             var maxOjamaTsumu = 5;
