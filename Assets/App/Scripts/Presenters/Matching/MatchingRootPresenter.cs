@@ -9,7 +9,7 @@ using Cysharp.Threading.Tasks;
 
 namespace App.Presenters.Matching
 {
-    public class MatchingRootPresenter : RootPresenterBase<MatchingRootPresenter>
+    public class MatchingRootPresenter : RootPresenterBase
     {
         private readonly MatchingStateView _matchingStateView;
         // ハッシュテーブルを宣言

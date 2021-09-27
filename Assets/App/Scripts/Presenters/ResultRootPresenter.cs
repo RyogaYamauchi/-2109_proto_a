@@ -7,7 +7,7 @@ using Cysharp.Threading.Tasks;
 namespace App.Presenters
 {
     [RootSceneName("Result")]
-    public class ResultRootPresenter : RootPresenterBase<ResultRootPresenter>
+    public class ResultRootPresenter : RootPresenterBase
     {
         public ResultRootPresenter(ResultRootView rootView, bool winOrLose)
         {

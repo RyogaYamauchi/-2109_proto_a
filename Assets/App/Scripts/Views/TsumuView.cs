@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.Design.Serialization;
 using App.Lib;
 using App.Types;
 using App.ViewModels;

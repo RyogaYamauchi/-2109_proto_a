@@ -9,7 +9,7 @@ using UnityEngine;
 namespace App.Presenters
 {
     [RootSceneName("Title")]
-    public class TitleRootPresenter : RootPresenterBase<TitleRootPresenter>
+    public class TitleRootPresenter : RootPresenterBase
     {
         protected override UniTask OnLoadAsync(CancellationToken cancellationToken)
         {

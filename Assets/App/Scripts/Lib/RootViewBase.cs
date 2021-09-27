@@ -1,7 +1,6 @@
 ﻿using System.Threading;
 using App.Common;
 using Cysharp.Threading.Tasks;
-using UnityEngine;
 using Zenject;
 
 namespace App.Lib
@@ -20,7 +19,7 @@ namespace App.Lib
 
 
         // 全体のRootPresenterを知るRootContextをロードする
-        protected async void PlayFromEditor<T>() where T : RootPresenterBase<T>
+        protected async void PlayFromEditor<T>() where T : RootPresenterBase
         {
             if (_commonSceneManager.IsStartingFromScript)
             {
@@ -30,7 +29,7 @@ namespace App.Lib
             _commonSceneManager.SetStartSceneName(RootSceneName.GetRootSceneName(typeof(T)));
             LoadPresenter<T>().Forget();
         }
-        private async UniTask LoadPresenter<T>() where T : RootPresenterBase<T>
+        private async UniTask LoadPresenter<T>() where T : RootPresenterBase
         {
             var presenterBase = _container.Resolve<T>();
             var cancellationTokenSource = new CancellationTokenSource();

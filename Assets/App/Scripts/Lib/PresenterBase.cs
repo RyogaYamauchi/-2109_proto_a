@@ -52,19 +52,9 @@ namespace App.Lib
             return instance;
         }
 
-        protected async UniTask<P> ChangeScene<P>(IParameter parameter = null) where  P : RootPresenterBase<P>
+        protected async UniTask<T> ChangeScene<T>(IParameter parameter = null) where  T : RootPresenterBase
         {
-            var type = typeof(P);
-            var name = RootSceneName.GetRootSceneName(type);
-            await _commonSceneManager.ReplaceSceneAsync(name);
-            var rootPresenter = _container.Resolve<P>();
-            var cancellationTokenSource = new CancellationTokenSource();
-            var token = cancellationTokenSource.Token;
-            rootPresenter.OnClosed += () => cancellationTokenSource.Cancel();
-            rootPresenter.SetParameter(parameter);
-            await rootPresenter.LoadAsync(token);
-            await rootPresenter.DidLoadAsync(token);
-            return rootPresenter;
+            return await _commonSceneManager.ReplaceSceneAsync<T>(parameter);
         }
 
         public void Dispose()

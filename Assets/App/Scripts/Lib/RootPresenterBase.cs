@@ -1,11 +1,9 @@
 ﻿using System.Linq;
 using App.Models;
-using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace App.Lib
 {
-    public abstract class RootPresenterBase<P> : PresenterBase
+    public abstract class RootPresenterBase : PresenterBase
     {
         protected GameModel _gameModel = GameModel.Instance;
         protected IParameter _parameter;

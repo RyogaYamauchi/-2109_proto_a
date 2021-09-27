@@ -15,7 +15,7 @@ using UnityEngine;
 namespace App.Presenters
 {
     [RootSceneName(("MainScene"))]
-    public sealed class MainRootPresenter : RootPresenterBase<MainRootPresenter>
+    public sealed class MainRootPresenter : RootPresenterBase
     {
         private MainRootView _mainRootView;
         private readonly int _canSelectDistance = 250;
