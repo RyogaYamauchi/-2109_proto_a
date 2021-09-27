@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using App.Models;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace App.Lib
@@ -12,7 +13,8 @@ namespace App.Lib
 
         protected T GetRootView<T>() where T : RootViewBase
         {
-            var obj = SceneManager.GetActiveScene().GetRootGameObjects();
+            var scene = _commonSceneManager.GetCurrentScene();
+            var obj = scene.GetRootGameObjects();
             return obj.FirstOrDefault(x => x.GetComponent<T>())?.GetComponent<T>();
         }
 

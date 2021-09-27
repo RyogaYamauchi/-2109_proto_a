@@ -11,7 +11,7 @@ namespace App.Lib
     public abstract class PresenterBase : IDisposable
     {
         protected DiContainer _container;
-        private CommonSceneManager _commonSceneManager;
+        protected CommonSceneManager _commonSceneManager;
 
         [Inject]
         public void Construct(DiContainer container, CommonSceneManager commonSceneManager)

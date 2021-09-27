@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using App.Lib;
 using App.Models;
 using App.Skills;
@@ -48,6 +47,8 @@ namespace App.Presenters
             _maxTsumuCount = param.MaxTsumuCount;
 
             _mainRootView = GetRootView<MainRootView>();
+            
+            _mainRootView.Initialize(param.IsSingleMode);
 
             _gameModel.TsumuRootModel.Initialize();
             _gameModel.PlayerParameter.Clear();

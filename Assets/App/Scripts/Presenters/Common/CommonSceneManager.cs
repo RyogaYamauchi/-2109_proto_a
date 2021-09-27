@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace App.Common
@@ -9,6 +10,7 @@ namespace App.Common
     {
         private string[] _cantPopSceneNames = {"RootScene"};
         private Stack<string> _sceneStack = new Stack<string>();
+        private Scene _currentScene;
         public bool IsStartingFromScript { get; private set; }
 
         public void SetStartSceneName(string name)
@@ -19,19 +21,21 @@ namespace App.Common
         public async UniTask PushSceneAsync(string name)
         {
             IsStartingFromScript = true;
-            SceneManager.sceneLoaded += (scene, mode) => { SetActiveScene(scene); };
+            SceneManager.sceneLoaded += SetActiveScene;
             await SceneManager.LoadSceneAsync(name, LoadSceneMode.Additive);
-            SceneManager.sceneLoaded -= (scene, mode) => { SetActiveScene(scene); };
+            SceneManager.sceneLoaded -= SetActiveScene;
             _sceneStack.Push(name);
         }
 
-        private void SetActiveScene(Scene scene)
+        private void SetActiveScene(Scene scene, LoadSceneMode mode)
         {
             if (_cantPopSceneNames.Contains(scene.name))
             {
                 return;
             }
             SceneManager.SetActiveScene(scene);
+            _currentScene = scene;
+            Debug.Log("画面遷移 : "+_currentScene.name);
         }
 
         public async UniTask ReplaceSceneAsync(string name)
@@ -39,6 +43,7 @@ namespace App.Common
             var targets = _sceneStack.Where(x => !_cantPopSceneNames.Contains(x));
             var tmp = new Stack<string>(targets.ToArray());
             var top = tmp.Pop();
+            _sceneStack = new Stack<string>(tmp.ToArray());
             await PushSceneAsync(name);
             await PopSceneAsync(top);
         }
@@ -46,6 +51,11 @@ namespace App.Common
         public async UniTask PopSceneAsync(string name)
         {
             await SceneManager.UnloadSceneAsync(name);
+        }
+
+        public Scene GetCurrentScene()
+        {
+            return SceneManager.GetActiveScene();
         }
     }
 }

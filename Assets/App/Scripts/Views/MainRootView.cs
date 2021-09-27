@@ -44,18 +44,10 @@ namespace App.Views
 
         public IObservable<Unit> OnClickGoTitleButtonAsObservable =>
             _goTitleButton.OnClickAsObservable().TakeUntilDestroy(this);
-
-        private void SingleModeSetUp()
+        
+        public void Initialize(bool paramIsSingleMode)
         {
-            _goTitleButton.gameObject.SetActive(true);
-        }
-
-        public void Initialize()
-        {
-            _goTitleButton.gameObject.SetActive(false);
-
-            SingleModeSetUp();
-
+            _goTitleButton.gameObject.SetActive(paramIsSingleMode);
             //var battlePresenter = new BattlePresenter(presenter, timerView, battleView);
             //battlePresenter.Initialize();
         }

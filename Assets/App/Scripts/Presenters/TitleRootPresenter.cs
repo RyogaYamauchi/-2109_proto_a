@@ -4,6 +4,7 @@ using App.Lib;
 using App.Presenters.Matching;
 using App.Views;
 using UniRx;
+using UnityEngine;
 
 namespace App.Presenters
 {
@@ -12,7 +13,6 @@ namespace App.Presenters
     {
         protected override UniTask OnLoadAsync(CancellationToken cancellationToken)
         {
-
             var rootView = GetRootView<TitleRootView>();
             rootView.OnClickOnline.Subscribe(x =>
             {
