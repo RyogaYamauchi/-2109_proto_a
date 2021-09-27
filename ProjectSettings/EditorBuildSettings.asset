@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/App/Scenes/Title.unity
     guid: f120b1986c8bf4a1dbbc7c4b6be00519
   - enabled: 1
-    path: Assets/Enami/Matching/Matching.unity
+    path: Assets/App/Scenes/Matching.unity
     guid: 3df5cd79f51f71f498849b2d13d4fa3f
   - enabled: 1
     path: Assets/App/Scenes/MainScene.unity

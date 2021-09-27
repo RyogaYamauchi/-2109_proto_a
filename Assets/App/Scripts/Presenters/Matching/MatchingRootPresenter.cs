@@ -1,53 +1,58 @@
+using System.Linq;
+using System.Threading;
 using Photon.Pun;
 using Photon.Realtime;
 using UniRx;
 using UnityEngine;
 using App.Lib;
-using App.View.Matching;
 using App.Views;
 using Cysharp.Threading.Tasks;
+using UnityEngine.SceneManagement;
 
-namespace App.Presenters.Matching
+namespace App.Presenters
 {
+    [RootSceneName(("Matching"))]
     public class MatchingRootPresenter : RootPresenterBase
     {
-        private readonly MatchingStateView _matchingStateView;
+        private MatchingRootView _matchingRootView;
+
         // ハッシュテーブルを宣言
         private ExitGames.Client.Photon.Hashtable _roomHash;
 
-        public MatchingRootPresenter(MatchingStateView stateView)
+        protected override UniTask OnLoadAsync(CancellationToken cancellationToken)
         {
-            _matchingStateView = stateView;
+            _matchingRootView = SceneManager.GetActiveScene().GetRootGameObjects()
+                .FirstOrDefault(x => x.GetComponent<MatchingRootView>())
+                ?.GetComponent<MatchingRootView>();
+            _matchingRootView.Initialize();
             Init();
+            return base.OnLoadAsync(cancellationToken);
         }
-        
+
         private void Init()
         {
             PhotonInitialize();
-            
-            _matchingStateView.ConnectedToMaster
+
+            _matchingRootView.ConnectedToMaster
                 .Subscribe(_ =>
                 {
                     // ランダムなルームに参加する
                     PhotonNetwork.JoinRandomRoom();
                 })
-                .AddTo(_matchingStateView);
-            
-            _matchingStateView.JoinedRoom
+                .AddTo(_matchingRootView);
+
+            _matchingRootView.JoinedRoom
                 .Subscribe(_ =>
                 {
                     //CreateAvatar();
                 })
-                .AddTo(_matchingStateView);
-            
-            _matchingStateView.JoinedFailedRoom
-                .Subscribe(_ =>
-                {
-                    CreateRoom();
-                })
-                .AddTo(_matchingStateView);
-            
-            _matchingStateView.PlayerJoinedRoom
+                .AddTo(_matchingRootView);
+
+            _matchingRootView.JoinedFailedRoom
+                .Subscribe(_ => { CreateRoom(); })
+                .AddTo(_matchingRootView);
+
+            _matchingRootView.PlayerJoinedRoom
                 .Subscribe(_ =>
                 {
                     if (!PhotonNetwork.IsMasterClient)
@@ -60,16 +65,12 @@ namespace App.Presenters.Matching
                         PhotonNetwork.CurrentRoom.IsOpen = false;
                         ChangeSceneState(SceneState.SceneStateType.Main);
                     }
-                    
                 })
-                .AddTo(_matchingStateView);
-            
-            _matchingStateView.ChangeScene
-                .Subscribe(_ =>
-                {
-                    ChangeSceneToMain();
-                })
-                .AddTo(_matchingStateView);
+                .AddTo(_matchingRootView);
+
+            _matchingRootView.ChangeScene
+                .Subscribe(_ => { ChangeSceneToMain(); })
+                .AddTo(_matchingRootView);
 
             if (PhotonNetwork.IsMasterClient)
             {
@@ -101,9 +102,9 @@ namespace App.Presenters.Matching
         private void ChangeSceneState(SceneState.SceneStateType sceneState)
         {
             var prop = PhotonNetwork.CurrentRoom.CustomProperties;
-            
+
             //キーを持っているか確認した方がよさそう
-            if (prop.TryGetValue("scene_state",out var _))
+            if (prop.TryGetValue("scene_state", out var _))
             {
                 prop["scene_state"] = sceneState.ToString();
             }
@@ -111,19 +112,18 @@ namespace App.Presenters.Matching
             {
                 prop.Add("scene_state", sceneState.ToString());
             }
+
             //更新したプロパティをセットする
             PhotonNetwork.CurrentRoom.SetCustomProperties(prop);
         }
-        
+
         /// <summary>
         /// MainSceneへ行く
         /// </summary>
-        private  void ChangeSceneToMain()
+        private void ChangeSceneToMain()
         {
             Debug.Log("main");
             ChangeScene<MainRootPresenter>(new MainRootView.Paramater(30, 300, false)).Forget();
         }
-
     }
 }
-
