@@ -1,3 +1,4 @@
+using System.Threading;
 using App.Lib;
 using App.Views;
 using UniRx;
@@ -8,9 +9,11 @@ namespace App.Presenters
     [RootSceneName("Result")]
     public class ResultRootPresenter : RootPresenterBase
     {
-        public ResultRootPresenter(ResultRootView rootView, bool winOrLose)
+        protected override UniTask OnLoadAsync(CancellationToken cancellationToken)
         {
+            var rootView = GetRootView<ResultRootView>();
             var param = (ResultRootView.Parameter) _parameter;
+            var winOrLose = param.IsWinOrLose;
             var view = GetRootView<ResultRootView>();
             view.Initialize(param.IsWinOrLose);
             rootView.OnClickRetry.Subscribe(x =>
@@ -19,10 +22,8 @@ namespace App.Presenters
                 rootView.PlayBGM(winOrLose);
             });
 
-            rootView.OnClickTitle.Subscribe(x =>
-            {
-                ChangeScene<TitleRootPresenter>().Forget();
-            });
+            rootView.OnClickTitle.Subscribe(x => { ChangeScene<TitleRootPresenter>().Forget(); });
+            return base.OnLoadAsync(cancellationToken);
         }
     }
 }

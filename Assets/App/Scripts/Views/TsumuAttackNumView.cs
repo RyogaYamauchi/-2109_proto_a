@@ -1,4 +1,5 @@
-﻿using App.Lib;
+﻿using System.Threading;
+using App.Lib;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
@@ -15,10 +16,10 @@ namespace App.Views
             _text.text = num.ToString();
         }
 
-        public async UniTask MoveToTarget(Vector3 position)
+        public async UniTask MoveToTarget(Vector3 position, CancellationToken cancellationToken)
         {
-            await transform.DOLocalMoveY(transform.localPosition.y + 20, 1).WithCancellation(_cancellationToken);
-            await transform.DOMove(position, 1).WithCancellation(_cancellationToken);
+            await transform.DOLocalMoveY(transform.localPosition.y + 20, 1).WithCancellation(cancellationToken).SuppressCancellationThrow();
+            await transform.DOMove(position, 1).WithCancellation(cancellationToken).SuppressCancellationThrow();
         }
     }
 }

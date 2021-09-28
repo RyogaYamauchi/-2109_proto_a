@@ -38,10 +38,12 @@ namespace App.Views
         [SerializeField] private Button _goTitleButton;
         [SerializeField] private Image skillMaxImage;
         [SerializeField] private Image _lowHpImage;
+        [SerializeField] private Button _winButton;
         private Color skillMaxColor = Color.clear;
         private float skillMaxTime;
 
         public IObservable<Unit> OnClickSkillAsObservable => _button.OnClickAsObservable().TakeUntilDestroy(this);
+        public IObservable<Unit> Win => _winButton.OnClickAsObservable().TakeUntilDestroy(this);
 
         public IObservable<Unit> OnClickGoTitleButtonAsObservable =>
             _goTitleButton.OnClickAsObservable().TakeUntilDestroy(this);

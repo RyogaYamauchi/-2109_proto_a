@@ -79,6 +79,11 @@ namespace App.Presenters
 
         private void SetEvents()
         {
+            _mainRootView.Win.Subscribe(x =>
+            {
+                _gameModel.BattleModel.SetWinOrLose(true);
+                _battlePresenter.FinishGame();
+            });
             _mainRootView.OnClickSkillAsObservable.Subscribe(x =>
             {
                 UseSkillAsync(_skill).Forget();
@@ -172,17 +177,17 @@ namespace App.Presenters
                 return;
             }
             var pos = tsumuView.transform.position;
-            PlayDamageView(pos, tsumuView, damage).Forget();
+            PlayDamageView(pos, tsumuView, damage, _mainRootView.GetCancellationTokenOnDestroy()).Forget();
             await tsumuView.CloseAsync();
         }
 
-        private async UniTask PlayDamageView(Vector3 pos, TsumuView tsumuView, int damage)
+        private async UniTask PlayDamageView(Vector3 pos, TsumuView tsumuView, int damage, CancellationToken cancellationToken)
         {
             var damageView = await CreateViewAsync<TsumuAttackNumView>();
             _mainRootView.SetParentTakeDamageNum(damageView);
             damageView.transform.position = pos;
             damageView.Initialize(damage);
-            await damageView.MoveToTarget(_mainRootView.GetEnemyPosition());
+            await damageView.MoveToTarget(_mainRootView.GetEnemyPosition(), cancellationToken);
             if (damageView != null)
             {
                 damageView.Dispose();

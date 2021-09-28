@@ -44,6 +44,9 @@ MonoBehaviour:
   - RPCArriveWinOrLoseFlag
   - RPCHealthForWinOrLose
   - RPCWinOrLoseFlag
+  - RPCMySelfHealthChanged
+  - RPCUpdateEnemyHealth
+  - RPCUpdatePlayerHealth
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

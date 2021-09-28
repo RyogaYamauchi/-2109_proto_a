@@ -51,9 +51,6 @@ namespace App.Views
             }
 
             SetRate(winOrLose);
-            
-            PhotonNetwork.LeaveRoom();
-            PhotonNetwork.Disconnect();
         }
         public void PlayBGM(bool winOrLose)
         {
