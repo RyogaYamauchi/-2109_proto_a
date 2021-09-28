@@ -53,18 +53,13 @@ namespace App.Presenters
                 .AddTo(_timerView);
 
             // resultに遷移
-            _timerView.ChangeSceneAsObservable
-                .Subscribe(_ => ChangeSceneToResult())
-                .AddTo(_timerView);
+            _timerView.ChangeSceneAsObservable.Subscribe(_ => ChangeSceneToResult()).AddTo(_timerView);
 
             // 勝敗判定を相手が受け取ったかの通知を購読
             _battleView.OnDecidedWinOrLose
                 .Subscribe(_ =>
                 {
-                    if (PhotonNetwork.IsMasterClient)
-                    {
-                        ChangeSceneState(SceneState.SceneStateType.Result);
-                    }
+                    ChangeSceneState(SceneState.SceneStateType.Result);
                 })
                 .AddTo(_battleView);
 
@@ -84,7 +79,7 @@ namespace App.Presenters
         public void FinishGame()
         {
             Debug.Log("FinishGame!!");
-            _battleView.SendArriveWinOrLoseFlag(GameModel.Instance.BattleModel.WinOrLose);
+            _battleView.SendDecideWinOrLoseFlag(GameModel.Instance.BattleModel.WinOrLose);
             _cancellationTokenSource.Cancel();
 
         }
@@ -118,7 +113,7 @@ namespace App.Presenters
             if (waitStartTimeResult.IsCanceled)
             {
                 // ルームを解除してリザルトに遷移
-                ChangeSceneToResult();
+                ChangeSceneState(SceneState.SceneStateType.Result);
                 return;
             }
 
@@ -131,12 +126,12 @@ namespace App.Presenters
             if (waitMainTimeResult.IsCanceled)
             {
                 // ルームを解除してリザルトに遷移
-                ChangeSceneToResult();
+                ChangeSceneState(SceneState.SceneStateType.Result);
                 return;
             }
 
             // 制限時間が来たら勝敗
-            ChangeSceneToResult();
+            ChangeSceneState(SceneState.SceneStateType.Result);
         }
 
         /// sceneStateを変更

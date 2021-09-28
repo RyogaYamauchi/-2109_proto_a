@@ -49,7 +49,8 @@ namespace App.Views
                 myRoom.IsOpen = false;            // 部屋を閉じる
                 myRoom.IsVisible = false;         // ロビーから見えなくする
             }
-
+            PhotonNetwork.LeaveRoom();
+            PhotonNetwork.Disconnect();
             SetRate(winOrLose);
         }
         public void PlayBGM(bool winOrLose)

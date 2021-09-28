@@ -9,7 +9,6 @@ namespace App.Views
     [PrefabPath("Prefabs/BattleView")]
     public class BattleView : MonoBehaviourPunCallbacks
     {
-        private readonly Subject<bool> _onWinOrLoseFlag = new Subject<bool>();
         private readonly Subject<bool> _onDecidedWinOrLose = new Subject<bool>();
         private readonly Subject<Unit> _leftPlayerFlag = new Subject<Unit>();
         private readonly Subject<int> _onChangedEnemyHealth = new Subject<int>();
@@ -43,13 +42,13 @@ namespace App.Views
         }
         
 
-        public void SendArriveWinOrLoseFlag(bool state)
+        public void SendDecideWinOrLoseFlag(bool state)
         {
-            photonView.RPC(nameof(RPCArriveWinOrLoseFlag), RpcTarget.All, state);
+            photonView.RPC(nameof(RPCDecideWinOrLoseFlag), RpcTarget.All, state);
         }
 
         [PunRPC]
-        private void RPCArriveWinOrLoseFlag(bool state)
+        private void RPCDecideWinOrLoseFlag(bool state)
         {
             _onDecidedWinOrLose.OnNext(state);
         }

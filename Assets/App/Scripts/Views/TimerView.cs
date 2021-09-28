@@ -15,7 +15,7 @@ namespace App.Views
 
         public IObservable<Unit> ChangeSceneAsObservable => _changeSceneSubject;
         
-        private bool _isChange = false;
+        private bool _isChange;
         public void ChangeCountDown(int countDown)
         {
             countText.text = countDown.ToString();
