@@ -1,64 +1,55 @@
-using UnityEngine;
+using System;
+using System.Threading;
 using App.Lib;
 using App.Models;
 using App.Views;
 using Cysharp.Threading.Tasks;
 using Photon.Pun;
 using UniRx;
-using UnityEngine.UI;
+using UnityEngine;
 
 namespace App.Presenters
 {
     public class BattlePresenter : PresenterBase
     {
-        private readonly PlayerParameter _playerParameter;
-        private MainRootPresenter _mainRootPresenter;
         private BattleView _battleView;
         private TimerView _timerView;
-        private readonly OnlineTimer _timer;
-        private bool _isWin;
+        private readonly OnlineTimerModel _timerModel;
 
-        public BattlePresenter(MainRootPresenter mainRootPresenter, TimerView timerView, BattleView battleView)
+        private Subject<Unit> _startGameSubject = new Subject<Unit>();
+        private Subject<Unit> _onChangedEnemyHealth = new Subject<Unit>();
+        private Subject<Unit> _onChangedPlayerHealth = new Subject<Unit>(); 
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+
+
+        public BattlePresenter()
         {
-            _mainRootPresenter = mainRootPresenter;
-
-            // scriptableObjectかPrefabとかで設定したい
-            _playerParameter = new PlayerParameter(100);
-            _timer = new OnlineTimer(5, 120);
-            
-            _timerView = timerView;
-            _battleView = battleView;
-            _isWin = false;
+            _timerModel = new OnlineTimerModel(5, 120);
         }
 
-        public void Initialize()
+        public IObservable<Unit> StartGameObservable => _startGameSubject.TakeUntilDestroy(_battleView);
+        public IObservable<Unit> OnChangedEnemyHealth => _onChangedEnemyHealth.TakeUntilDestroy(_battleView);
+        public IObservable<Unit> OnChangedPlayerHealth => _onChangedPlayerHealth.TakeUntilDestroy(_battleView);
+
+        public void Initialize(TimerView timerView, BattleView battleView)
         {
+            _battleView = battleView;
+
+            _timerView = timerView;
+            StartGame().Forget();
             // タイマーセット
             if (PhotonNetwork.IsMasterClient)
             {
-                _timer.OnlineInitialize();
+                _timerModel.OnlineInitialize();
             }
-            
-            // Timerを動かす
-            _timerView.OnStartTimeAsObservable
-                .Subscribe(startTime =>
-                {
-                    _timer.StartTimer(startTime).Forget();
-                }).AddTo(_timerView);
-            
+
             // タイマーの値が変わったことを受け取る
-            _timer.ObserveEveryValueChanged(x => x.CountDown)
+            _timerModel.CountDowntime
                 .Subscribe(_timerView.ChangeCountDown)
                 .AddTo(_timerView);
-            
-            _timer.ObserveEveryValueChanged(x => x.TotalTime)
-                .Skip(1)
+
+            _timerModel.CurrentTime
                 .Subscribe(_timerView.ChangeTimer)
-                .AddTo(_timerView);
-            
-            _timer.ObserveEveryValueChanged(x => x.IsStart)
-                .Where(x => x)
-                .Subscribe( _ => _mainRootPresenter.SetEvents())
                 .AddTo(_timerView);
 
             // resultに遷移
@@ -66,94 +57,8 @@ namespace App.Presenters
                 .Subscribe(_ => ChangeSceneToResult())
                 .AddTo(_timerView);
 
-
-            // ダメージ受ける処理
-            _battleView.OnDamagedAsObservable
-                .Subscribe(ReceiveDamage).AddTo(_battleView);
-
-            
-            // ツム消した通知を受け取る
-            // 攻撃
-            _mainRootPresenter.AttackDamageObservable
-                .Skip(1)
-                .Subscribe(damage =>
-                {
-                    _battleView.SendDamage(damage);
-                })
-                .AddTo(_battleView);
-
-            // 回復
-            _mainRootPresenter.HealTsumuNumObservable
-                .Skip(1)
-                .Subscribe(num =>
-                {
-                    var addHealth = CalculateHeal(num);
-                    GameModel.Instance.PlayerParameter.Recover(addHealth);
-                })
-                .AddTo(_battleView);
-            
-            // 体力が変わったことを相手に通知
-            GameModel.Instance.PlayerParameter.Health
-                .Subscribe(health =>
-                {
-                    Debug.Log(health);
-                    _battleView.SendHealthChange(health);
-                    if (health <= 0)
-                    {
-                        _battleView.SendHealthForWinOrLose(health);
-                        // 負けResultに飛びたい
-                        _isWin = false;
-                        _battleView.SendWinOrLoseFlag(!_isWin);
-                    }else if(health <= 20)
-                    {
-                        _battleView.LowHpFlush();
-                    }else if(health > 20)
-                    {
-                        _battleView.LowHpStop();
-                    }
-                })
-                .AddTo(_battleView);
-            
-            // 敵の体力が変わった通知を受けとる
-            _battleView.OnHealthChangeAsObservable
-                .Subscribe(health =>
-                {
-                    _battleView.SetEnemyHp(health , GameModel.Instance.PlayerParameter.MaxHealth);
-                })
-                .AddTo(_battleView);
-            
-            // TimeUpになったらシーンステートを変更
-            _timer.ObserveEveryValueChanged(x => x.IsTimeUp)
-                .Where(x => x)
-                .Subscribe(_ =>
-                {
-                    if (!PhotonNetwork.IsMasterClient)
-                    {
-                        _battleView.SendHealthForWinOrLose(GameModel.Instance.PlayerParameter.Health.Value);
-                    }
-                })
-                .AddTo(_timerView);
-
-            // マスターしか受け取らない
-            _battleView.OnHealthForWinOrLoseAsObservable
-                .Subscribe(enemyHealth =>
-                {
-                    _isWin = Judge(enemyHealth);
-                    // 勝敗結果を送る
-                    _battleView.SendWinOrLoseFlag(!_isWin);
-                });
-
-            // 勝敗判定を受け取る
-            _battleView.OnWinOrLoseFlagAsObservable
-                .Subscribe(isWin =>
-                {
-                    _isWin = isWin;
-                    _battleView.SendArriveWinOrLoseFlag();
-                })
-                .AddTo(_battleView);
-            
             // 勝敗判定を相手が受け取ったかの通知を購読
-            _battleView.ArriveWinOrLoseFlag
+            _battleView.OnDecidedWinOrLose
                 .Subscribe(_ =>
                 {
                     if (PhotonNetwork.IsMasterClient)
@@ -162,62 +67,87 @@ namespace App.Presenters
                     }
                 })
                 .AddTo(_battleView);
-            
+
             // プレイヤーが抜けた
             _battleView.LeftPlayerFlag
                 .Subscribe(_ =>
                 {
-                    _isWin = true;
-                    ChangeSceneState(SceneState.SceneStateType.Result);
+                    GameModel.Instance.BattleModel.SetWinOrLose(true);
+                    FinishGame();
                 })
                 .AddTo(_battleView);
+
+            battleView.OnChangedEnemyHealth.Subscribe(UpdateEnemyHealth);
+            battleView.OnChangedPlayerHealth.Subscribe(UpdatePlayerHealth);
         }
 
-        private bool Judge(float enemyHealth)
+        public void FinishGame()
         {
-            if (enemyHealth <= 0)
-            {
-                return true;
-            }
+            Debug.Log("FinishGame!!");
+            _battleView.SendArriveWinOrLoseFlag(GameModel.Instance.BattleModel.WinOrLose);
+            _cancellationTokenSource.Cancel();
+
+        }
+
+        private void UpdatePlayerHealth(int health)
+        {
+            GameModel.Instance.PlayerModel.SetHealth(health);
+            _onChangedPlayerHealth.OnNext(Unit.Default);
+        }
+
+        private void UpdateEnemyHealth(int health)
+        {
+            GameModel.Instance.EnemyModel.SetHealth(health);
+            _onChangedEnemyHealth.OnNext(Unit.Default);
+        }
+
+        private void SetUp()
+        {
+            UpdateEnemyHealth(200);
+            UpdatePlayerHealth(200);
+        }
+
+        private async UniTask StartGame()
+        {
+            SetUp();
+            // 5秒待つ
+
+            var waitStartTimeResult = await _timerModel.WaitSeconds(5, _cancellationTokenSource.Token).SuppressCancellationThrow();
             
-            return GameModel.Instance.PlayerParameter.Health.Value > enemyHealth;
+            Debug.Log("開始！");
+            if (waitStartTimeResult.IsCanceled)
+            {
+                // ルームを解除してリザルトに遷移
+                ChangeSceneToResult();
+                return;
+            }
+
+            _startGameSubject.OnNext(Unit.Default);
+            // 120秒待つ
+            var waitMainTimeResult = await _timerModel.WaitSeconds(120, _cancellationTokenSource.Token).SuppressCancellationThrow();
+            // どちらかのHPが0になったら勝敗
+            Debug.Log("終了!");
+
+            if (waitMainTimeResult.IsCanceled)
+            {
+                // ルームを解除してリザルトに遷移
+                ChangeSceneToResult();
+                return;
+            }
+
+            // 制限時間が来たら勝敗
+            ChangeSceneToResult();
         }
-        
 
-        /// <summary>
-        /// ダメージ受けた時の処理
-        /// </summary>
-        /// <param name="damage"></param>
-        private void ReceiveDamage(float damage)
-        {
-            GameModel.Instance.PlayerParameter.RecieveDamage(damage);
-        }
-
-        /// <summary>
-        /// 消したツムの数で回復量を計算
-        /// </summary>
-        /// <param name="tsumuNum"></param>
-        /// <returns></returns>
-        private float CalculateHeal(int tsumuNum)
-        {
-            var addHealth = tsumuNum;
-
-            // コンボ倍率
-            // damage *= _playerParameter.Combo;
-
-            return addHealth;
-        }
-        
-        /// <summary>
         /// sceneStateを変更
         /// </summary>
         /// <param name="sceneState"></param>
         private void ChangeSceneState(SceneState.SceneStateType sceneState)
         {
             var prop = PhotonNetwork.CurrentRoom.CustomProperties;
-            
+
             //キーを持っているか確認した方がよさそう
-            if (prop.TryGetValue("scene_state",out var _))
+            if (prop.TryGetValue("scene_state", out var _))
             {
                 prop["scene_state"] = sceneState.ToString();
             }
@@ -225,16 +155,32 @@ namespace App.Presenters
             {
                 prop.Add("scene_state", sceneState.ToString());
             }
+
             //更新したプロパティをセットする
             PhotonNetwork.CurrentRoom.SetCustomProperties(prop);
         }
-        
+
         /// <summary>
         /// ResultSceneへ行く
         /// </summary>
         private void ChangeSceneToResult()
         {
-            ChangeScene<ResultRootPresenter>(new ResultRootView.Parameter(_isWin, null)).Forget();
+            ChangeScene<ResultRootPresenter>(
+                new ResultRootView.Parameter(GameModel.Instance.BattleModel.WinOrLose)).Forget();
+        }
+
+
+        public void UpdateMySelfHealth()
+        {
+            var health = GameModel.Instance.PlayerModel.Health;
+            _battleView.UpdatePlayerHealth(health);
+        }
+
+
+        public void UpdateEnemyHealth()
+        {
+            var health = GameModel.Instance.EnemyModel.Health;
+            _battleView.UpdateEnemyHealth(health);
         }
     }
 }

@@ -10,7 +10,9 @@ namespace App.Presenters
     {
         public ResultRootPresenter(ResultRootView rootView, bool winOrLose)
         {
-            //view.OnClickTitle.Subscribe(x => ChangeScene<Title>);
+            var param = (ResultRootView.Parameter) _parameter;
+            var view = GetRootView<ResultRootView>();
+            view.Initialize(param.IsWinOrLose);
             rootView.OnClickRetry.Subscribe(x =>
             {
                 ChangeScene<MatchingRootPresenter>().Forget();

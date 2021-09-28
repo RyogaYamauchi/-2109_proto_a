@@ -1,7 +1,6 @@
 ﻿using System;
 using App.Lib;
-using App.Presenters;
-using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,12 +13,14 @@ namespace App.Views
         {
             public int MaxTsumuCount;
             public int MaxHp;
+            public int MaxTime;
             public bool IsSingleMode;
 
-            public Paramater(int maxTsumuCount, int maxHp, bool isSingleMode)
+            public Paramater(int maxTsumuCount, int maxTime, int maxHp, bool isSingleMode)
             {
                 MaxTsumuCount = maxTsumuCount;
                 MaxHp = maxHp;
+                maxTime = maxTime;
                 IsSingleMode = isSingleMode;
             }
         }
@@ -28,15 +29,15 @@ namespace App.Views
         [SerializeField] private Transform _tsumuSpawnRoot;
         [SerializeField] private Transform _tsumuRoot;
         [SerializeField] private Slider _hpSlider;
+        [SerializeField] private Slider _enemyHpslider;
         [SerializeField] private GameObject _enemyObject;
         [SerializeField] private GameObject _takeDamageNumRoot;
-
-        [SerializeField] private TimerView timerView;
-        [SerializeField] private BattleView battleView;
+        [SerializeField] private BattleView _battleView;
+        [SerializeField] private TimerView _timerView;
         [SerializeField] private Slider _skillSlider;
         [SerializeField] private Button _goTitleButton;
-
         [SerializeField] private Image skillMaxImage;
+        [SerializeField] private Image _lowHpImage;
         private Color skillMaxColor = Color.clear;
         private float skillMaxTime;
 
@@ -48,8 +49,11 @@ namespace App.Views
         public void Initialize(bool paramIsSingleMode)
         {
             _goTitleButton.gameObject.SetActive(paramIsSingleMode);
-            //var battlePresenter = new BattlePresenter(presenter, timerView, battleView);
-            //battlePresenter.Initialize();
+        }
+
+        public void SetActiveGoTitleButton(bool state)
+        {
+            _goTitleButton.gameObject.SetActive(state);
         }
 
         public void SetParentTsumu(TsumuView tsumuView)
@@ -120,6 +124,30 @@ namespace App.Views
         public void SkillMaxStop()
         {
             skillMaxColor = Color.clear;
+        }
+        
+        public TimerView GetTimerView()
+        {
+            return _timerView;
+        }
+        
+        public void SetEnemyHp(int value, int maxValue)
+        {
+            _enemyHpslider.minValue = 0;
+            _enemyHpslider.maxValue = maxValue;
+            _enemyHpslider.value = value;
+        }
+        
+        public void SetHpState(bool flush)
+        {
+            //画面を赤塗り
+            _lowHpImage.color = flush ? new Color(0.5f, 0f, 0f, 0.5f) : Color.clear;
+            _lowHpImage.DOFade(0, 1).Loops();
+        }
+
+        public BattleView GetBattleView()
+        {
+            return _battleView;
         }
     }
 }

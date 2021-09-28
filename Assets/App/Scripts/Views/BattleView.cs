@@ -1,149 +1,63 @@
 using System;
-using App.Models;
+using App.Lib;
 using Photon.Pun;
 using Photon.Realtime;
 using UniRx;
-using UnityEngine;
-using UnityEngine.UI;
 
 namespace App.Views
 {
+    [PrefabPath("Prefabs/BattleView")]
     public class BattleView : MonoBehaviourPunCallbacks
     {
-        [SerializeField] private Slider playerHpSlider;
-        [SerializeField] private Slider enemyHpSlider;
-        [SerializeField] private Image lowHpImage;
-        private Color lowHpColor = Color.clear;
-        private float lowHpTime;
-
-
-        private readonly Subject<float> _onDamagedSubject = new Subject<float>();
-        public IObservable<float> OnDamagedAsObservable => _onDamagedSubject.TakeUntilDestroy(this);
-        
-        private readonly Subject<float> _onHealthChangeSubject = new Subject<float>();
-        public IObservable<float> OnHealthChangeAsObservable => _onHealthChangeSubject.TakeUntilDestroy(this);
-        
-        private readonly Subject<float> _onHealthForWinOrLoseSubject = new Subject<float>();
-        public IObservable<float> OnHealthForWinOrLoseAsObservable => _onHealthForWinOrLoseSubject.TakeUntilDestroy(this);
-        
         private readonly Subject<bool> _onWinOrLoseFlag = new Subject<bool>();
-        public IObservable<bool> OnWinOrLoseFlagAsObservable => _onWinOrLoseFlag.TakeUntilDestroy(this);
-        
-        private readonly Subject<Unit> _arriveWinOrLoseFlag = new Subject<Unit>();
-        public IObservable<Unit> ArriveWinOrLoseFlag => _arriveWinOrLoseFlag;
-        
+        private readonly Subject<bool> _onDecidedWinOrLose = new Subject<bool>();
         private readonly Subject<Unit> _leftPlayerFlag = new Subject<Unit>();
+        private readonly Subject<int> _onChangedEnemyHealth = new Subject<int>();
+        private readonly Subject<int> _onChangedPlayerHealth = new Subject<int>();
+        
+        public IObservable<bool> OnDecidedWinOrLose => _onDecidedWinOrLose;
         public IObservable<Unit> LeftPlayerFlag => _leftPlayerFlag;
-
-
-        public void SendDamage(float damage)
+        public IObservable<int> OnChangedEnemyHealth => _onChangedEnemyHealth.TakeUntilDestroy(this);
+        public IObservable<int> OnChangedPlayerHealth => _onChangedPlayerHealth.TakeUntilDestroy(this);
+        
+        public void UpdatePlayerHealth(int health)
         {
-            // 敵に通知
-            photonView.RPC(nameof(RPCDamaged), RpcTarget.Others, damage);
-            
-            // 自分の画面に反映
+            photonView.RPC(nameof(RPCUpdatePlayerHealth), RpcTarget.Others, health);
+        }
+
+        [PunRPC]
+        private void RPCUpdatePlayerHealth(int health)
+        {
+            _onChangedEnemyHealth.OnNext(health);
+        }
+
+        public void UpdateEnemyHealth(int health)
+        {
+            photonView.RPC(nameof(RPCUpdateEnemyHealth), RpcTarget.Others, health);
         }
         
         [PunRPC]
-        private void RPCDamaged(float damage) 
+        private void RPCUpdateEnemyHealth(int health)
         {
-            _onDamagedSubject.OnNext(damage);
+            _onChangedPlayerHealth.OnNext(health);
         }
         
-        
-        public void SendHealthChange(float health)
+
+        public void SendArriveWinOrLoseFlag(bool state)
         {
-            photonView.RPC(nameof(RPCHealthChange), RpcTarget.Others, health);
-            
-            // 自分の体力変える
-            SetPlayerHp(health , GameModel.Instance.PlayerParameter.MaxHealth);
+            photonView.RPC(nameof(RPCArriveWinOrLoseFlag), RpcTarget.All, state);
         }
-        
+
         [PunRPC]
-        private void RPCHealthChange(float health) 
+        private void RPCArriveWinOrLoseFlag(bool state)
         {
-            _onHealthChangeSubject.OnNext(health);
+            _onDecidedWinOrLose.OnNext(state);
         }
-
-        public void SetPlayerHp(float value, float maxValue)
-        {
-            playerHpSlider.minValue = 0;
-            playerHpSlider.maxValue = maxValue;
-            playerHpSlider.value = value;
-        }
-        
-        public void SetEnemyHp(float value, float maxValue)
-        {
-            enemyHpSlider.minValue = 0;
-            enemyHpSlider.maxValue = maxValue;
-            enemyHpSlider.value = value;
-        }
-        
-        
-        public void SendHealthForWinOrLose(float health)
-        {
-            photonView.RPC(nameof(RPCHealthForWinOrLose), RpcTarget.Others, health);
-        }
-        
-        [PunRPC]
-        private void RPCHealthForWinOrLose(float health) 
-        {
-            _onHealthForWinOrLoseSubject.OnNext(health);
-        }
-        
-        public void SendWinOrLoseFlag(bool isWin)
-        {
-            photonView.RPC(nameof(RPCWinOrLoseFlag), RpcTarget.Others, isWin);
-        }
-        
-        [PunRPC]
-        private void RPCWinOrLoseFlag(bool isWin) 
-        {
-            _onWinOrLoseFlag.OnNext(isWin);
-        }
-        
-        public void SendArriveWinOrLoseFlag()
-        {
-            photonView.RPC(nameof(RPCArriveWinOrLoseFlag), RpcTarget.All);
-        }
-        
-        [PunRPC]
-        private void RPCArriveWinOrLoseFlag() 
-        {
-            _arriveWinOrLoseFlag.OnNext(Unit.Default);
-        }
-
-        public void LowHpFlush()
-        {
-            //画面を赤塗り
-            lowHpColor = new Color(0.5f, 0f, 0f, 0.5f);
-        }
-
-        public void Update()
-        {
-            //時間経過ごとに透明化
-            lowHpTime += Time.deltaTime;
-            if (lowHpTime >= 1.0f)
-            {
-                lowHpTime = 0f;
-            }
-            lowHpImage.color = Color.Lerp(lowHpColor, Color.clear, lowHpTime);
-        }
-
-        public void LowHpStop()
-        {
-            lowHpColor = Color.clear;
-        }
-
-
         
         // プレイヤーが抜けた
-        public override void OnPlayerLeftRoom(Player otherPlayer) 
+        public override void OnPlayerLeftRoom(Player otherPlayer)
         {
             _leftPlayerFlag.OnNext(Unit.Default);
         }
-        
-        
     }
 }
-

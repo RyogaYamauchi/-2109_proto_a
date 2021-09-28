@@ -19,7 +19,7 @@ namespace App.Presenters
 
             rootView.OnClickSingle.Subscribe(x =>
             {
-                ChangeScene<MainRootPresenter>(new MainRootView.Paramater(30 , 500, true)).Forget();
+                ChangeScene<MainRootPresenter>(new MainRootView.Paramater(30 , 120, 500, true)).Forget();
             });
             return base.OnLoadAsync(cancellationToken);
         }

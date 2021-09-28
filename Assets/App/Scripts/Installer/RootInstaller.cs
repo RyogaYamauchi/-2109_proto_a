@@ -11,5 +11,7 @@ public class RootInstaller : MonoInstaller
         Container.Bind<ResultRootPresenter>().AsTransient();
         Container.Bind<CommonSceneManager>().AsSingle();
         Container.Bind<MatchingRootPresenter>().AsTransient();
+
+        Container.Bind<BattlePresenter>().AsTransient();
     }
 }

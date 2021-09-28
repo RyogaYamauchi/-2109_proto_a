@@ -13,12 +13,10 @@ namespace App.Views
         public class Parameter : IParameter
         {
             public bool IsWinOrLose;
-            public ISkill Skill;
 
-            public Parameter(bool isWinorLose, ISkill skill)
+            public Parameter(bool isWinorLose)
             {
                 IsWinOrLose = isWinorLose;
-                Skill = skill;
             }
         }
         [SerializeField]
@@ -40,21 +38,11 @@ namespace App.Views
         public GameObject loseEnemy;
         public GameObject winEnemy;
 
-        public void Initialize()
+        public void Initialize(bool winOrLose)
         {
-            var winOrLose = true;
-            if (winOrLose == true)
-            {
-                _resultText.text = "You win";
-                winEnemy.SetActive(true);
-                loseEnemy.SetActive(false);
-            }
-            else if (winOrLose == false)
-            {
-                _resultText.text = "You lose";
-                winEnemy.SetActive(false);
-                loseEnemy.SetActive(true);
-            }
+            _resultText.text = winOrLose ? "You win" : "You lose";
+            winEnemy.SetActive(winOrLose);
+            loseEnemy.SetActive(!winOrLose);
             if (PhotonNetwork.IsMasterClient) 
             {
                 var myRoom = PhotonNetwork.CurrentRoom;

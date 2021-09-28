@@ -5,6 +5,6 @@ public class MainInstaller : MonoInstaller
 {
     public override void InstallBindings()
     {
-        Container.Bind<TitleRootPresenter>().AsTransient();
+        Container.Bind<BattlePresenter>().AsTransient();
     }
 }

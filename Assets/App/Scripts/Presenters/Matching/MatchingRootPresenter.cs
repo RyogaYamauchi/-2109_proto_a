@@ -123,7 +123,7 @@ namespace App.Presenters
         private void ChangeSceneToMain()
         {
             Debug.Log("main");
-            ChangeScene<MainRootPresenter>(new MainRootView.Paramater(30, 300, false)).Forget();
+            ChangeScene<MainRootPresenter>(new MainRootView.Paramater(30, 120, 300, false)).Forget();
         }
     }
 }

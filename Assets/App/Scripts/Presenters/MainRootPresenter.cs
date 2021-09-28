@@ -10,6 +10,7 @@ using App.Views;
 using Cysharp.Threading.Tasks;
 using UniRx;
 using UniRx.Triggers;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace App.Presenters
@@ -17,55 +18,66 @@ namespace App.Presenters
     [RootSceneName(("MainScene"))]
     public sealed class MainRootPresenter : RootPresenterBase
     {
-        private MainRootView _mainRootView;
         private readonly int _canSelectDistance = 250;
         private readonly Vector2[] _spawnPoint =
         {
             new Vector2(-225, 0), new Vector2(-150, 0), new Vector2(-75, 0),
             new Vector2(0, 0), new Vector2(75, 0), new Vector2(150, 0), new Vector2(225, 0)
         };
+        private readonly BattlePresenter _battlePresenter;
+
 
         private TsumuRootModel _tsumuRootModel => _gameModel.TsumuRootModel;
         private List<TsumuView> _tsumuViewList = new List<TsumuView>();
         private List<Vector2> _canSpawnTsumuPoints = new List<Vector2>();
         private List<TsumuView> _closingViewList = new List<TsumuView>();
         private int _maxTsumuCount;
-
+        private MainRootView _mainRootView;
         private ISkill _skill;
-        
-        // 攻撃ツム消した数
-        private readonly ReactiveProperty<int> _attackDamageReactiveProperty = new ReactiveProperty<int>(0);
-        public IObservable<int> AttackDamageObservable => _attackDamageReactiveProperty;
-        
-        // 回復ツム消した数
         private readonly ReactiveProperty<int> _healTsumuNumReactiveProperty = new ReactiveProperty<int>(0);
+
+        public MainRootPresenter(BattlePresenter battlePresenter)
+        {
+            _battlePresenter = battlePresenter;
+        }
+            
         public IObservable<int> HealTsumuNumObservable => _healTsumuNumReactiveProperty;
 
         protected override UniTask OnLoadAsync(CancellationToken cancellationToken)
         {
             var param = (MainRootView.Paramater)_parameter;
             _maxTsumuCount = param.MaxTsumuCount;
-
             _mainRootView = GetRootView<MainRootView>();
-            
-            _mainRootView.Initialize(param.IsSingleMode);
 
             _gameModel.TsumuRootModel.Initialize();
-            _gameModel.PlayerParameter.Clear();
+            _gameModel.PlayerModel.Clear();
+            _gameModel.EnemyModel.Clear();
             _skill = _gameModel.SkillModel.GetRandomSkill();
-            _gameModel.SkillModel.Initialize(_skill.GetNeedValue());
+            _gameModel.SkillModel.Initialize(_skill);
             _canSpawnTsumuPoints = new List<Vector2>(_spawnPoint);
-
-            _gameModel.SkillModel.SkillPoint.Subscribe(x =>
-            {
-                _mainRootView.SetSkillValue(_gameModel.SkillModel.SkillPoint.Value, _gameModel.SkillModel.MaxSkillPoint);
-            }).AddTo(_mainRootView);
             _mainRootView.SetActiveSkillButton(false);
+            
+            if (!param.IsSingleMode)
+            {
+                _mainRootView.SetActiveGoTitleButton(param.IsSingleMode);
+                _battlePresenter.Initialize(_mainRootView.GetTimerView(), _mainRootView.GetBattleView());
+                _battlePresenter.StartGameObservable.Subscribe(x => SetEvents());
+                _battlePresenter.OnChangedEnemyHealth.Subscribe(x =>
+                {
+                    _mainRootView.SetEnemyHp(_gameModel.EnemyModel.Health, _gameModel.EnemyModel.MaxHealth);
+                });
+                _battlePresenter.OnChangedPlayerHealth.Subscribe(x =>
+                {
+                    _mainRootView.SetHp(_gameModel.PlayerModel.Health, _gameModel.PlayerModel.MaxHealth);
+                });
+                return UniTask.CompletedTask;
+            }
+
             SetEvents();
             return UniTask.CompletedTask;
         }
 
-        public void SetEvents()
+        private void SetEvents()
         {
             _mainRootView.OnClickSkillAsObservable.Subscribe(x =>
             {
@@ -79,6 +91,11 @@ namespace App.Presenters
             {
                 ChangeScene<TitleRootPresenter>().Forget();
             });
+            
+            _gameModel.SkillModel.SkillPoint.Subscribe(x =>
+            {
+                _mainRootView.SetSkillValue(_gameModel.SkillModel.SkillPoint.Value, _gameModel.SkillModel.MaxSkillPoint);
+            }).AddTo(_mainRootView);
         }
         
         private void RefillTsumus()
@@ -213,14 +230,23 @@ namespace App.Presenters
                 _closingViewList.Remove(tsumu);
                 c++;
             }
-            
-            if (views.Any(x => x.TsumuType == TsumuType.Heal))
+
+            if (views.All(x => x.TsumuType == TsumuType.Heal))
             {
-                _healTsumuNumReactiveProperty.Value = chain;
+                _gameModel.PlayerModel.Recover(chain);
+                _mainRootView.SetHp(_gameModel.PlayerModel.Health, _gameModel.PlayerModel.MaxHealth);
+                _battlePresenter.UpdateMySelfHealth();
             }
             else
             {
-                _attackDamageReactiveProperty.Value = sumDamage;
+                _gameModel.EnemyModel.RecieveDamage(sumDamage);
+                _mainRootView.SetEnemyHp(_gameModel.EnemyModel.Health, _gameModel.EnemyModel.MaxHealth);
+                _battlePresenter.UpdateEnemyHealth();
+                if (_gameModel.EnemyModel.IsDied())
+                {
+                    _gameModel.BattleModel.SetWinOrLose(true);
+                    _battlePresenter.FinishGame();
+                }
             }
         }
 
@@ -281,11 +307,6 @@ namespace App.Presenters
             {
                 DespawnTsumuAsync(view.Item1,view.Item2 ).Forget();
             }
-        }
-
-        public void TakeDamage(int damage)
-        {
-            _attackDamageReactiveProperty.Value = damage;
         }
 
         public IReadOnlyList<TsumuView> GetClosingTsumuList()

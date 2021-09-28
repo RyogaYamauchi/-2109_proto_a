@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using App.Skills;
+using ExitGames.Client.Photon.StructWrapping;
 using UniRx;
 
 namespace App.Models
@@ -20,9 +21,9 @@ namespace App.Models
             return _enableSkills.OrderBy(x => Guid.NewGuid()).First();
         }
 
-        public void Initialize(int maxValue)
+        public void Initialize(ISkill skill)
         {
-            _maxSkillPoint = maxValue;
+            _maxSkillPoint = skill.GetNeedValue();
             _skillPoint.Value = 0;
         }
 
