@@ -74,6 +74,7 @@ namespace App.Presentation
             _hpSlider.minValue = 0;
             _hpSlider.maxValue = viewModel.MaxHealth;
             _hpSlider.value = viewModel.Health;
+            Debug.Log(viewModel.Health);
         }
 
         public Vector3 GetEnemyPosition()

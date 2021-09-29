@@ -14,16 +14,19 @@ namespace App.Presentation
         private string[] _cantPopSceneNames = {"RootScene"};
         private Stack<string> _sceneStack = new Stack<string>();
         private DiContainer _container;
+        private RootPresenterBase _currentPresenterBase;
 
         public CommonSceneManager(DiContainer container)
         {
             _container = container;
         }
+
         public bool IsStartingFromScript { get; private set; }
 
-        public void SetStartSceneName(string name)
+        public void SetStartSceneName(string name, RootPresenterBase rootPresenterBase)
         {
             _sceneStack.Push(name);
+            _currentPresenterBase = rootPresenterBase;
         }
 
         public async UniTask PushSceneAsync(string name)
@@ -41,30 +44,31 @@ namespace App.Presentation
             {
                 return;
             }
+
             SceneManager.SetActiveScene(scene);
-            Debug.Log("画面遷移 : "+scene.name);
+            Debug.Log("画面遷移 : " + scene.name);
         }
 
         public async UniTask<T> ReplaceSceneAsync<T>(IParameter parameter) where T : RootPresenterBase
         {
+            _currentPresenterBase.Dispose();
+
             var type = typeof(T);
             var name = RootSceneName.GetRootSceneName(type);
-            
+
             var targets = _sceneStack.Where(x => !_cantPopSceneNames.Contains(x));
             var tmp = new Stack<string>(targets.ToArray());
             var top = tmp.Pop();
             _sceneStack = new Stack<string>(tmp.ToArray());
             await PushSceneAsync(name);
             await PopSceneAsync(top);
-            
-            var rootPresenter = _container.Resolve<T>();
-            var cancellationTokenSource = new CancellationTokenSource();
-            var token = cancellationTokenSource.Token;
-            rootPresenter.OnClosed += () => cancellationTokenSource.Cancel();
-            rootPresenter.SetParameter(parameter);
-            await rootPresenter.LoadAsync(token);
-            await rootPresenter.DidLoadAsync(token);
-            return rootPresenter;
+
+            _currentPresenterBase = _container.Resolve<T>();
+
+            _currentPresenterBase.SetParameter(parameter);
+            await _currentPresenterBase.LoadAsync();
+            await _currentPresenterBase.DidLoadAsync();
+            return (T) _currentPresenterBase;
         }
 
         public async UniTask PopSceneAsync(string name)

@@ -1,9 +1,11 @@
 ﻿using System.Linq;
+using System.Threading;
 
 namespace App.Lib
 {
     public abstract class RootPresenterBase : PresenterBase
     {
+      
         protected IParameter _parameter;
         
         protected T GetRootView<T>() where T : RootViewBase

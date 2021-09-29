@@ -38,9 +38,7 @@ namespace App.Presentation
         public void Initialize(TimerView timerView, BattleView battleView)
         {
             _battleView = battleView;
-
             _timerView = timerView;
-            StartGame().Forget();
             // タイマーセット
             if (PhotonNetwork.IsMasterClient)
             {
@@ -102,15 +100,17 @@ namespace App.Presentation
 
         private void SetUp()
         {
-            UpdateEnemyHealth(200);
+            //UpdateEnemyHealth(200);
+            //_battleView.UpdatePlayerHealth(200);
             UpdatePlayerHealth(200);
+            _battleView.UpdatePlayerHealth(200);
         }
 
-        private async UniTask StartGame()
+        public async UniTask StartGame()
         {
             SetUp();
+            
             // 5秒待つ
-
             var waitStartTimeResult = await _timerModel.WaitSeconds(5, _cancellationTokenSource.Token).SuppressCancellationThrow();
             
             Debug.Log("開始！");

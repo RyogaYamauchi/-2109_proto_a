@@ -58,6 +58,7 @@ namespace App.Presentation
                 {
                     _mainRootView.SetHp(_mainRootUseCase.GetPlayerViewModel());
                 });
+                _battlePresenter.StartGame().Forget();
                 return UniTask.CompletedTask;
             }
 
@@ -145,17 +146,19 @@ namespace App.Presentation
                 return;
             }
             var pos = tsumuView.transform.position;
-            PlayDamageView(pos, tsumuView, damage, _mainRootView.GetCancellationTokenOnDestroy()).Forget();
+            PlayDamageView(pos, tsumuView, damage).Forget();
             await tsumuView.CloseAsync();
         }
 
-        private async UniTask PlayDamageView(Vector3 pos, TsumuView tsumuView, int damage, CancellationToken cancellationToken)
+        private async UniTask PlayDamageView(Vector3 pos, TsumuView tsumuView, int damage)
         {
             var damageView = await CreateViewAsync<TsumuAttackNumView>();
             _mainRootView.SetParentTakeDamageNum(damageView);
             damageView.transform.position = pos;
             damageView.Initialize(damage);
-            await damageView.MoveToTarget(_mainRootView.GetEnemyPosition(), cancellationToken);
+            var a = _cancellationToken.IsCancellationRequested;
+            Debug.Log(a);
+            await damageView.MoveToTarget(_mainRootView.GetEnemyPosition(), _cancellationToken);
             if (damageView != null)
             {
                 damageView.Dispose();

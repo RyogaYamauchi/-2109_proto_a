@@ -33,7 +33,6 @@ namespace App.Presentation
 
         public void UpdateEnemyHealth(int health)
         {
-            Debug.Log(health);
             photonView.RPC(nameof(RPCUpdateEnemyHealth), RpcTarget.Others, health);
         }
         

@@ -26,16 +26,15 @@ namespace App.Lib
                 return;
             }
             await _commonSceneManager.PushSceneAsync("RootScene");
-            _commonSceneManager.SetStartSceneName(RootSceneName.GetRootSceneName(typeof(T)));
-            LoadPresenter<T>().Forget();
-        }
-        private async UniTask LoadPresenter<T>() where T : RootPresenterBase
-        {
             var presenterBase = _container.Resolve<T>();
-            var cancellationTokenSource = new CancellationTokenSource();
-            var token = cancellationTokenSource.Token;
-            await presenterBase.LoadAsync(token);
-            await presenterBase.DidLoadAsync(token);
+
+            _commonSceneManager.SetStartSceneName(RootSceneName.GetRootSceneName(typeof(T)), presenterBase);
+            LoadPresenter(presenterBase).Forget();
+        }
+        private async UniTask LoadPresenter(RootPresenterBase presenterBase)
+        {
+            await presenterBase.LoadAsync();
+            await presenterBase.DidLoadAsync();
         }
     }
 }

@@ -18,8 +18,8 @@ namespace App.Presentation
 
         public async UniTask MoveToTarget(Vector3 position, CancellationToken cancellationToken)
         {
-            await transform.DOLocalMoveY(transform.localPosition.y + 20, 1).WithCancellation(cancellationToken).SuppressCancellationThrow();
-            await transform.DOMove(position, 1).WithCancellation(cancellationToken).SuppressCancellationThrow();
+            await transform.DOLocalMoveY(transform.localPosition.y + 20, 1).ToUniTask(cancellationToken:cancellationToken);
+            await transform.DOMove(position, 1).ToUniTask(cancellationToken:cancellationToken);
         }
     }
 }

@@ -10,6 +10,8 @@ namespace App.Lib
 {
     public abstract class PresenterBase : IDisposable
     {
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        protected CancellationToken _cancellationToken => _cancellationTokenSource.Token;
         protected DiContainer _container;
         protected CommonSceneManager _commonSceneManager;
 
@@ -23,14 +25,14 @@ namespace App.Lib
         public Action OnClosed;
 
        
-        public async UniTask LoadAsync(CancellationToken cancellationToken)
+        public async UniTask LoadAsync()
         {
-            await OnLoadAsync(cancellationToken);
+            await OnLoadAsync(_cancellationToken);
         }
 
-        public async UniTask DidLoadAsync(CancellationToken cancellationToken)
+        public async UniTask DidLoadAsync()
         {
-            await OnDidLoadAsync(cancellationToken);
+            await OnDidLoadAsync(_cancellationToken);
         }
 
         protected virtual UniTask OnLoadAsync(CancellationToken cancellationToken)
@@ -59,7 +61,8 @@ namespace App.Lib
 
         public void Dispose()
         {
-            OnClosed.Invoke();
+            _cancellationTokenSource.Cancel();
+            OnClosed?.Invoke();
         }
     }
 }
