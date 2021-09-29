@@ -32,7 +32,6 @@ namespace App.Domain
 
         public void RecieveDamage(int damage)
         {
-            var health = Health;
             CacheHealth = Health;
             var newHealth = Health - damage;
 

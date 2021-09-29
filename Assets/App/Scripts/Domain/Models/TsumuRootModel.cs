@@ -168,5 +168,10 @@ namespace App.Domain
         {
             return _selectingTsumuIdList.Select(x => _tsumuList.FirstOrDefault(model => model.Guid == x)).ToList();
         }
+
+        public int GetSelectingDamage()
+        {
+            return _selectingTsumuIdList.Select(x => _tsumuList.FirstOrDefault(model => model.Guid==x)).Sum(x => x.MasterTsumu.AttackPoint);
+        }
     }
 }

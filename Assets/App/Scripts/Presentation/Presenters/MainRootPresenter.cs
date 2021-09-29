@@ -183,11 +183,10 @@ namespace App.Presentation
             var chain = _mainRootUseCase.GetSelectingCount();
             var playerHealth = _mainRootUseCase.GetPlayerViewModel().Health;
             var enemyHealth = _mainRootUseCase.GetEnemyViewModel().Health;
-            var sumDamage = 0;
-
+            var sumDamage = _mainRootUseCase.GetSumDamage();
+            var recoverDamage = _mainRootUseCase.GetRecoverDamage();
             await _mainRootUseCase.DeleteSelectingTsumu(async (guid, damage) =>
             {
-                sumDamage += damage;
                 await DespawnTsumuAsync(guid, damage);
                 _mainRootUseCase.AddSkillPoint();
 
@@ -196,9 +195,10 @@ namespace App.Presentation
                     _mainRootView.SetActiveSkillButton(true);
                 }
             });
-
-            _mainRootUseCase.ResolveDamage(chain, sumDamage);
-
+            
+            _mainRootUseCase.ResolveDamage(sumDamage);
+            _mainRootUseCase.ResolveRecover(recoverDamage);
+            
             var afterPlayerViewModel = _mainRootUseCase.GetPlayerViewModel();
             var afterEnemyViewModel = _mainRootUseCase.GetEnemyViewModel();
             if (afterPlayerViewModel.Health != playerHealth)

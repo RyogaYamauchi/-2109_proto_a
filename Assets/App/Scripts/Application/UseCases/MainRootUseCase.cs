@@ -99,21 +99,40 @@ namespace App.Application
             return _gameModel.SkillModel.CanExecuteSkill();
         }
 
-        public void ResolveDamage(int chain, int sumDamage)
+        public void ResolveDamage(int sumDamage)
+        {
+            _gameModel.EnemyModel.RecieveDamage(sumDamage);
+            if (_gameModel.EnemyModel.IsDied())
+            {
+                _gameModel.BattleModel.SetWinOrLose(true);
+            }
+        }
+
+        public void ResolveRecover(int recover)
+        {
+            _gameModel.PlayerModel.Recover(recover);
+        }
+
+        public int GetSumDamage()
+        {
+            var selectingTsumuModelList = _gameModel.TsumuRootModel.GetSelectingTsumuList();
+            if (selectingTsumuModelList.Any(x => x.MasterTsumu.TsumuType != TsumuType.Heal))
+            {
+                return _gameModel.TsumuRootModel.GetSelectingDamage();
+            }
+
+            return 0;
+        }
+
+        public int GetRecoverDamage()
         {
             var selectingTsumuModelList = _gameModel.TsumuRootModel.GetSelectingTsumuList();
             if (selectingTsumuModelList.All(x => x.MasterTsumu.TsumuType == TsumuType.Heal))
             {
-                _gameModel.PlayerModel.Recover(chain);
+                return _gameModel.TsumuRootModel.GetSelectingDamage();
             }
-            else
-            {
-                _gameModel.EnemyModel.RecieveDamage(sumDamage);
-                if (_gameModel.EnemyModel.IsDied())
-                {
-                    _gameModel.BattleModel.SetWinOrLose(true);
-                }
-            }
+
+            return 0;
         }
 
         public int GetSelectingCount()
