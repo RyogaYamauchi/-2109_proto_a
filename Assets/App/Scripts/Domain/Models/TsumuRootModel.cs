@@ -144,7 +144,7 @@ namespace App.Domain
             var ids = GetSelectingTsumuIdList();
             var chain = ids.Count;
             var models = _tsumuList.Where(x => ids.Contains(x.Guid)).ToArray();
-
+            
 
             var deleteTsumuList = ids.Select(id => models.FirstOrDefault(x => id == x.Guid)).ToArray();
             // UnSelectする
@@ -161,11 +161,7 @@ namespace App.Domain
                 _closingTsumuIdList.Remove(tsumu.Guid);
                 c++;
             }
-        }
 
-        public void ResolveDamage()
-        {
-           
         }
 
         public IReadOnlyList<TsumuModel> GetSelectingTsumuList()

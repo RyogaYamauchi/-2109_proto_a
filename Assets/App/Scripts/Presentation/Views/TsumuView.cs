@@ -60,8 +60,7 @@ namespace App.Presentation
             _button.image = _instance.GetComponent<Image>();
             viewModel.IsSelecting.Subscribe(x =>
             {
-                Debug.Log(x);
-                SetInteractive(x);
+                SetInteractive(!x);
                 ChangeColor(x);
             }).AddTo(this);
         }
