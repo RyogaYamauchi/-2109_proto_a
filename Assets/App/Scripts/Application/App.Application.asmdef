@@ -1,0 +1,21 @@
+{
+    "name": "App.Application",
+    "rootNamespace": "",
+    "references": [
+        "App.Domain",
+        "Zenject",
+        "App.Data",
+        "UniTask",
+        "UniRx",
+        "PhotonUnityNetworking"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,21 @@
+{
+    "name": "App.DI",
+    "rootNamespace": "",
+    "references": [
+        "GUID:95da722505b58bc4bbd80354272f1ba0",
+        "GUID:22e25c8005314e14a93993e2f29a7171",
+        "GUID:4b9cb92be6994d344904afa4a0be5d3a",
+        "GUID:6117f7662ec01ff48800e40e27e9975a",
+        "GUID:22579d525f24adc4d9ea218ba7fbd516",
+        "GUID:0d8beb7f090555447a6cf5ce9e54dbb4"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

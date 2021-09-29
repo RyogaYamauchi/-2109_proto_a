@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a168975c5d8a4ccd97180b306bc5d130, type: 3}
   m_Name: Square
   m_EditorClassIdentifier: 
+  _id: 3
   _tsumuType: 0
   _colliderGameObject: {fileID: 5684856827884847655, guid: 84d98987aed7c224eb26d752004ebaf4, type: 3}
   _attackPoint: 3

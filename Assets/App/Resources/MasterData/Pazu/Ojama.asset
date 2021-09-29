@@ -12,5 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a168975c5d8a4ccd97180b306bc5d130, type: 3}
   m_Name: Ojama
   m_EditorClassIdentifier: 
+  _id: 2
   _tsumuType: 5
   _colliderGameObject: {fileID: 5684856827884847655, guid: 486505d5d3bd44bf48ab4873d46b6054, type: 3}
+  _attackPoint: 0
